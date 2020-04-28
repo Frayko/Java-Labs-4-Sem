@@ -11,23 +11,19 @@ public class Habitat extends JComponent {
     private long END_TIME = 0;
     private long LAST_SPAWN_TIME_GOLDEN = 0;
     private long LAST_SPAWN_TIME_GUPPI = 0;
-    private long PERIOD;
     private FishCreator fishCreator = new FishCreator();
     private boolean IS_RUNNING = false;
     private Vector<Fish> fishs;
     Timer timer = null;
 
     //Параметры
-    private int N1,N2;
-    private double P1, P2;
+    private int N1 = 500;
+    private int N2 = 300;
+    private double P1 = 0.4;
+    private double P2 = 0.5;
+    private long PERIOD = 10;
 
-    public Habitat(int N1, int N2, double P1, double P2, int PERIOD) {
-        this.N1 = N1;
-        this.N2 = N2;
-        this.P1 = P1;
-        this.P2 = P2;
-        this.PERIOD = PERIOD;
-    }
+    public Habitat() {}
 
     public void update(long time) {
         int window_width = this.getWidth();

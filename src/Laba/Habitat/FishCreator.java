@@ -12,18 +12,22 @@ public class FishCreator {
         GuppiFishCount = 0;
     }
 
-    public Fish createFish(FishTypes type,int x, int y) {
+    public Fish createFish(FishTypes type, int x, int y) {
         Fish toReturn;
         switch (type) {
-            case GoldenFish -> {
+            case GoldenFish: {
                 toReturn = new GoldenFish(x, y);
                 GoldenFishCount++;
+                break;
             }
-            case GuppiFish -> {
+            case GuppiFish: {
                 toReturn = new GuppiFish(x, y);
                 GuppiFishCount++;
+                break;
             }
-            default -> throw new IllegalArgumentException("Wrong fish type: " + type);
+            default: {
+                throw new IllegalArgumentException("Wrong fish type: " + type);
+            }
         }
         return toReturn;
     }
@@ -40,14 +44,17 @@ public class FishCreator {
     public int getFishCount(FishTypes type) {
         int toReturn;
         switch (type) {
-            case GoldenFish:
+            case GoldenFish: {
                 toReturn = GoldenFishCount;
                 break;
-            case GuppiFish:
+            }
+            case GuppiFish: {
                 toReturn = GuppiFishCount;
                 break;
-            default:
+            }
+            default: {
                 throw new IllegalArgumentException("Wrong fish type: " + type);
+            }
         }
         return toReturn;
     }
