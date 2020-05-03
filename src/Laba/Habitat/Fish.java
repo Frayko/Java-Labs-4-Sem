@@ -18,7 +18,7 @@ public abstract class Fish implements IBehaviour {
     @Override
     public void setY(int y) { this.Y = y; }
     @Override
-    public double getX() { return this.X; }
+    public int getX() { return this.X; }
     @Override
-    public double getY() { return this.Y; }
+    public int getY() { return this.Y; }
 }

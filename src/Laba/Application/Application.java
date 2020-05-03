@@ -13,8 +13,9 @@ public class Application extends JFrame {
     private int window_width;
     private int window_height;
 
-    private JLabel timerLabel = new JLabel("Таймер: Выкл");
-    private JTextArea infoLabel = new JTextArea();
+    private JLabel timerLabel;
+    private JLabel timerStatus;
+    private JTextArea infoLabel;
 
     private boolean TIMER_LABEL_VISIBLE;
 
@@ -27,12 +28,13 @@ public class Application extends JFrame {
         this.window_height = height;
 
         this.setTitle("Генератор рыбок");
-        this.setIconImage(new ImageIcon("src/Laba/Assets/fish_icon.png").getImage());
+        this.setIconImage(new ImageIcon("src/Laba/Assets/window_icon.png").getImage());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setBounds(50, 50, window_width, window_height);
         this.setBackground(Color.white);
         this.setResizable(true);
 
+        timerLabel = new JLabel("Таймер: 0.00");
         timerLabel.setBounds(5, 0, 130, 20);
         timerLabel.setForeground(Color.black);
         timerLabel.setFont(new Font("Open Sans", Font.BOLD,16));
@@ -41,6 +43,15 @@ public class Application extends JFrame {
         timerLabel.setFocusable(false);
         this.add(timerLabel);
 
+        timerStatus = new JLabel("Статус: " + StatusType.ВЫКЛ);
+        timerStatus.setBounds(5,20, 200,20);
+        timerStatus.setForeground(Color.black);
+        timerStatus.setFont(new Font("Open Sans", Font.BOLD, 16));
+        timerStatus.setVisible(true);
+        timerStatus.setFocusable(false);
+        this.add(timerStatus);
+
+        infoLabel = new JTextArea();
         infoLabel.setBounds(0, 100, 200, 100);
         infoLabel.setBackground(Color.LIGHT_GRAY);
         infoLabel.setForeground(Color.DARK_GRAY);
@@ -56,15 +67,22 @@ public class Application extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_B -> {
+                    case KeyEvent.VK_B: {
                         start();
+                        break;
                     }
-                    case KeyEvent.VK_E -> {
+                    case KeyEvent.VK_E: {
                         stop();
+                        break;
                     }
-                    case KeyEvent.VK_T -> {
+                    case KeyEvent.VK_T: {
                         TIMER_LABEL_VISIBLE = !TIMER_LABEL_VISIBLE;
                         timerLabel.setVisible(TIMER_LABEL_VISIBLE);
+                        timerStatus.setVisible(TIMER_LABEL_VISIBLE);
+                        break;
+                    }
+                    case KeyEvent.VK_ESCAPE: {
+                        System.exit(0);
                     }
                 }
             }
@@ -75,6 +93,7 @@ public class Application extends JFrame {
     private void start() {
         if(habitat.begin_simulation()) {
             infoLabel.setVisible(false);
+            timerStatus.setText("Статус: " + StatusType.ВКЛ);
             timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -88,6 +107,7 @@ public class Application extends JFrame {
 
     private void stop() {
         if(habitat.end_simulation()) {
+            timerStatus.setText("Статус: " + StatusType.ВЫКЛ);
             infoLabel.setText(habitat.getMetrics());
             infoLabel.setVisible(true);
         }
