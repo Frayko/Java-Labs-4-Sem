@@ -58,5 +58,4 @@ public class FishCreator {
         }
         return toReturn;
     }
-
 }

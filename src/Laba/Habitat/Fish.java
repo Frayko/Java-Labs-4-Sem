@@ -3,8 +3,8 @@ package Laba.Habitat;
 import java.awt.*;
 
 public abstract class Fish implements IBehaviour {
-    protected int X;
-    protected int Y;
+    private int X;
+    private int Y;
 
     public Fish(int x, int y) {
         X = x;

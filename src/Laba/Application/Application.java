@@ -17,7 +17,7 @@ public class Application extends JFrame {
     private JLabel timerStatus;
     private JTextArea infoLabel;
 
-    private boolean TIMER_LABEL_VISIBLE;
+    private boolean isVisible;
 
     private Timer timer;
     private Habitat habitat;
@@ -39,7 +39,7 @@ public class Application extends JFrame {
         timerLabel.setForeground(Color.black);
         timerLabel.setFont(new Font("Open Sans", Font.BOLD,16));
         timerLabel.setVisible(true);
-        TIMER_LABEL_VISIBLE = true;
+        isVisible = true;
         timerLabel.setFocusable(false);
         this.add(timerLabel);
 
@@ -76,9 +76,9 @@ public class Application extends JFrame {
                         break;
                     }
                     case KeyEvent.VK_T: {
-                        TIMER_LABEL_VISIBLE = !TIMER_LABEL_VISIBLE;
-                        timerLabel.setVisible(TIMER_LABEL_VISIBLE);
-                        timerStatus.setVisible(TIMER_LABEL_VISIBLE);
+                        isVisible = !isVisible;
+                        timerLabel.setVisible(isVisible);
+                        timerStatus.setVisible(isVisible);
                         break;
                     }
                     case KeyEvent.VK_ESCAPE: {
@@ -98,7 +98,7 @@ public class Application extends JFrame {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    timerLabel.setVisible(TIMER_LABEL_VISIBLE);
+                    timerLabel.setVisible(isVisible);
                     timerLabel.setText("Таймер: " + habitat.getTime());
                 }
             }, 0, habitat.getPeriod());

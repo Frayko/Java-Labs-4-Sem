@@ -25,6 +25,6 @@ public class GuppiFish extends Fish {
     }
 
     public void drawImage(Graphics g) {
-        g.drawImage(image, this.X, this.Y, null);
+        g.drawImage(image, getX(), getY(), null);
     }
 }

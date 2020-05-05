@@ -28,6 +28,7 @@ public class Habitat extends JComponent {
     public void update(long time) {
         int window_width = this.getWidth();
         int window_height = this.getHeight();
+        boolean isRepaint = false;
 
         if ((time - LAST_SPAWN_TIME_GOLDEN) % N1 == 0) {
             LAST_SPAWN_TIME_GOLDEN = time;
@@ -35,6 +36,7 @@ public class Habitat extends JComponent {
                 int x = (int) (Math.random() * (window_width - 100));
                 int y = (int) (Math.random() * (window_height - 70));
                 fishs.addElement(fishCreator.createFish(FishTypes.GoldenFish, x, y));
+                isRepaint = true;
             }
         }
 
@@ -44,8 +46,12 @@ public class Habitat extends JComponent {
                 int x = (int) (Math.random() * (window_width - 100));
                 int y = (int) (Math.random() * (window_height - 70));
                 fishs.addElement(fishCreator.createFish(FishTypes.GuppiFish, x, y));
+                isRepaint = true;
             }
         }
+
+        if(isRepaint)
+            repaint();
     }
 
     public boolean begin_simulation() {
@@ -75,7 +81,6 @@ public class Habitat extends JComponent {
             public void run() {
                 END_TIME = System.currentTimeMillis() / PERIOD * PERIOD;
                 update(END_TIME - BEGIN_TIME);
-                repaint();
             }
         }, 0, PERIOD);
     }
@@ -106,5 +111,4 @@ public class Habitat extends JComponent {
         str += "\nГуппи: "; str += fishCreator.getFishCount(FishTypes.GuppiFish);
         return str;
     }
-
 }
