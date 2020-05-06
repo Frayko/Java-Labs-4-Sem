@@ -1,4 +1,4 @@
-package Laba.Habitat;
+package LaboratoryWork.Habitat;
 
 public interface IBehaviour {
     void setX(int x);

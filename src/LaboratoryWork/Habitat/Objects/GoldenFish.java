@@ -1,26 +1,26 @@
-package Laba.Habitat.Objects;
+package LaboratoryWork.Habitat.Objects;
 
-import Laba.Habitat.Fish;
-
+import LaboratoryWork.Habitat.Fish;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class GuppiFish extends Fish {
+
+public class GoldenFish extends Fish {
     private static BufferedImage image;
 
     static {
         try {
-            image = ImageIO.read(new File("src/Laba/Assets/guppi_fish.png"));
+            image = ImageIO.read(new File("src/LaboratoryWork/Assets/golden_fish.png"));
         }
         catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public GuppiFish(int x, int y) {
+    public GoldenFish(int x, int y) {
         super(x,y);
     }
 

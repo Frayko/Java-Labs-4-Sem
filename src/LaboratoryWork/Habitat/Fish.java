@@ -1,4 +1,4 @@
-package Laba.Habitat;
+package LaboratoryWork.Habitat;
 
 import java.awt.*;
 
