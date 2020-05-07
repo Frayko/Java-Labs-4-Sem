@@ -483,6 +483,11 @@ public class Application extends JFrame {
             pause_item.setToolTipText("Пауза");
             main_menu.add(pause_item);
 
+            JMenuItem exit_item = new JMenuItem("Выход");
+            exit_item.addActionListener(actionEvent -> System.exit(0));
+            exit_item.setToolTipText("Закрыть программу");
+            main_menu.add(exit_item);
+
             this.add(main_menu);
         }
     }
