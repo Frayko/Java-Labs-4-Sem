@@ -14,9 +14,6 @@ public class Application extends JFrame {
     private final int window_width;
     private final int window_height;
 
-    private final JLabel timerLabel;
-    private final JLabel timerStatus;
-
     private final JButton start_button;
     private final JButton stop_button;
     private final JButton pause_button;
@@ -26,6 +23,8 @@ public class Application extends JFrame {
 
     private final ModalInfoDialog modalInfoDialog;
     private final Menu menu;
+    private final StatusPanel statusPanel;
+    private final TimerPanel timerPanel;
 
     private boolean isVisible = true;
     private boolean isAllowModalInfo = true;
@@ -59,26 +58,13 @@ public class Application extends JFrame {
 
         this.setJMenuBar(menu = new Menu());
 
-        timerLabel = new JLabel("Таймер: 0.0");
-        timerLabel.setBounds(5, 0, 130, 20);
-        timerLabel.setForeground(Color.black);
-        timerLabel.setFont(new Font("Open Sans", Font.BOLD,16));
-        timerLabel.setVisible(isVisible);
-        timerLabel.setFocusable(false);
-        timerLabel.setToolTipText("Время в секундах");
-        scene.add(timerLabel);
-
-        timerStatus = new JLabel("Статус: " + habitat.getStatus());
-        timerStatus.setBounds(5,20, 200,20);
-        timerStatus.setForeground(Color.RED);
-        timerStatus.setFont(new Font("Open Sans", Font.BOLD, 16));
-        timerStatus.setVisible(true);
-        timerStatus.setFocusable(false);
-        timerStatus.setToolTipText("Статус таймера");
-        scene.add(timerStatus);
+        statusPanel = new StatusPanel();
+        timerPanel = new TimerPanel();
 
         scene.add(habitat, BorderLayout.CENTER);
         scene.add(control_panel, BorderLayout.EAST);
+        scene.add(timerPanel, BorderLayout.SOUTH);
+        scene.add(statusPanel, BorderLayout.NORTH);
         this.add(scene);
 
         this.setFocusable(true);
@@ -164,8 +150,7 @@ public class Application extends JFrame {
         show_timer_radio_button.setBackground(control_panel.getBackground());
         show_timer_radio_button.addActionListener(actionEvent -> {
             isVisible = true;
-            timerLabel.setVisible(true);
-            timerStatus.setVisible(true);
+            timerPanel.setVisible(true);
             requestFocus(false);
         });
         timer_radio_button_panel.add(show_timer_radio_button);
@@ -174,8 +159,7 @@ public class Application extends JFrame {
         hide_timer_radio_button.setBackground(control_panel.getBackground());
         hide_timer_radio_button.addActionListener(actionEvent -> {
             isVisible = false;
-            timerLabel.setVisible(false);
-            timerStatus.setVisible(false);
+            timerPanel.setVisible(false);
             requestFocus(false);
         });
         timer_radio_button_panel.add(hide_timer_radio_button);
@@ -331,24 +315,18 @@ public class Application extends JFrame {
             menu.stop_item.setEnabled(true);
             pause_button.setEnabled(true);
             menu.pause_item.setEnabled(true);
-            timerStatus.setText("Статус: " + habitat.getStatus());
-            timerStatus.setForeground(Color.green);
             runTimer();
         }
     }
 
     private void pause() {
         habitat.pause_simulation();
-        timerStatus.setText("Статус: " + habitat.getStatus());
-        timerStatus.setForeground(Color.ORANGE);
         pause_button.setText("Продолжить");
         menu.pause_item.setText("Продолжить");
     }
 
     private void continue_() {
         habitat.continue_simulation();
-        timerStatus.setText("Статус: " + habitat.getStatus());
-        timerStatus.setForeground(Color.green);
         pause_button.setText("Приостановить");
         menu.pause_item.setText("Приостановить");
     }
@@ -384,14 +362,11 @@ public class Application extends JFrame {
         menu.stop_item.setEnabled(false);
         pause_button.setEnabled(false);
         menu.pause_item.setEnabled(false);
-        timerStatus.setText("Статус: " + habitat.getStatus());
-        timerStatus.setForeground(Color.RED);
     }
 
     private void show_hide_timer() {
         isVisible = !isVisible;
-        timerLabel.setVisible(isVisible);
-        timerStatus.setVisible(isVisible);
+        timerPanel.setVisible(isVisible);
         if(isVisible) {
             show_timer_radio_button.setSelected(true);
             hide_timer_radio_button.setSelected(false);
@@ -407,7 +382,7 @@ public class Application extends JFrame {
 
         private ModalInfoDialog () {
             int dialog_window_width = 250;
-            int dialog_window_height = 190;
+            int dialog_window_height = 220;
 
             this.setTitle("Результаты симуляции");
             this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/attention.png").getImage());
@@ -417,25 +392,28 @@ public class Application extends JFrame {
                         window_height/2 - dialog_window_height/4,
                         dialog_window_width, dialog_window_height);
             this.setLayout(new GridLayout(2,1));
+            this.setResizable(false);
 
             info_area = new JTextArea(habitat.getMetrics());
             info_area.setEditable(false);
             info_area.setBackground(this.getBackground());
             info_area.setForeground(this.getForeground());
             info_area.setFont(new Font("Open Sans", Font.ITALIC,14));
-            info_area.setPreferredSize(new Dimension(250,95));
+            info_area.setPreferredSize(new Dimension(250,110));
 
-            Dimension button_size = new Dimension(80,30);
+            Dimension button_size = new Dimension(100,45);
 
             JButton ok_button = new JButton("ОК");
             ok_button.setPreferredSize(button_size);
             ok_button.setBackground(Color.white);
             ok_button.setForeground(this.getForeground());
+            ok_button.setToolTipText("Прекратить симуляцию");
 
             JButton cancel_button = new JButton("Отмена");
             cancel_button.setPreferredSize(button_size);
             cancel_button.setBackground(Color.white);
             cancel_button.setForeground(this.getForeground());
+            cancel_button.setToolTipText("Продолжить симуляцию");
 
             JLabel question = new JLabel("Прекратить симуляцию?");
             question.setBackground(this.getBackground());
@@ -450,6 +428,24 @@ public class Application extends JFrame {
 
             ok_button.addActionListener(actionEvent -> { stopped(); dispose(); });
             cancel_button.addActionListener(actionEvent -> { continue_(); dispose(); });
+
+            this.setFocusable(true);
+
+            addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    switch (e.getKeyCode()) {
+                        case KeyEvent.VK_ENTER -> {
+                            stopped();
+                            dispose();
+                        }
+                        case KeyEvent.VK_ESCAPE -> {
+                            continue_();
+                            dispose();
+                        }
+                    }
+                }
+            });
 
             this.add(info_area);
             this.add(panel_buttons);
@@ -492,12 +488,55 @@ public class Application extends JFrame {
         }
     }
 
+    private class TimerPanel extends JPanel {
+        JLabel text;
+
+        TimerPanel() {
+            this.setBackground(Color.GRAY);
+
+            text = new JLabel("Время симуляции: " + habitat.getTime());
+            text.setBounds(5,20, 200,20);
+            text.setFont(new Font("Open Sans", Font.BOLD, 16));
+            text.setVisible(true);
+            text.setFocusable(false);
+
+            this.setToolTipText("Текущее время симуляции в секундах");
+            this.add(text);
+            this.setVisible(true);
+        }
+    }
+
+    private class StatusPanel extends JPanel {
+        JLabel text;
+
+        StatusPanel() {
+            this.setBackground(Color.RED);
+
+            text = new JLabel("Статус симуляции: " + habitat.getStatus());
+            text.setBounds(5,20, 200,20);
+            text.setFont(new Font("Open Sans", Font.BOLD, 16));
+            text.setVisible(true);
+            text.setFocusable(false);
+
+            this.setToolTipText("Текущий статус симуляции");
+            this.add(text);
+            this.setVisible(true);
+        }
+    }
+
     private void runTimer() {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                timerLabel.setText("Таймер: " + habitat.getTime());
+                timerPanel.text.setText("Время симуляции: " + habitat.getTime());
+                statusPanel.text.setText("Статус симуляции: " + habitat.getStatus());
+                if(habitat.getStatus() == Status.ВЫКЛ)
+                    statusPanel.setBackground(Color.RED);
+                else if(habitat.getStatus() == Status.ВКЛ)
+                    statusPanel.setBackground(Color.GREEN);
+                else if(habitat.getStatus() == Status.ПАУЗА)
+                    statusPanel.setBackground(Color.ORANGE);
             }
         }, 0, habitat.getPeriod());
     }

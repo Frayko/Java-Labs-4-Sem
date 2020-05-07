@@ -110,6 +110,7 @@ public class Habitat extends JComponent {
         str += fishCreator.getAllFishCount();
         str += "\nЗолотых: "; str += fishCreator.getFishCount(FishTypes.GoldenFish);
         str += "\nГуппи: "; str += fishCreator.getFishCount(FishTypes.GuppiesFish);
+        str += "\n----------------------------------------------";
         return str;
     }
 }

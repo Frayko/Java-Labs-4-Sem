@@ -1,26 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="fixfixfix">
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Assets/attention.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/FishArray.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Status.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Application/Application.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Application/StatusType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Assets/golden_fish.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Assets/golden_fish.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Assets/guppi_fish.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Assets/guppies_fish.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Assets/window_icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Assets/window_icon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Habitat/Fish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Habitat/FishCreator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/FishCreator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Habitat/FishTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/FishTypes.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Habitat/Habitat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Habitat/IBehaviour.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/IBehaviour.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Habitat/Objects/GoldenFish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Objects/GoldenFish.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Habitat/Objects/GuppiFish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Objects/GuppiesFish.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Laba/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +133,7 @@
       <workItem from="1588667817250" duration="1871000" />
       <workItem from="1588669746028" duration="2856000" />
       <workItem from="1588674361490" duration="15839000" />
-      <workItem from="1588773167528" duration="34860000" />
+      <workItem from="1588773167528" duration="38216000" />
     </task>
     <task id="LOCAL-00001" summary="Test">
       <created>1584975465495</created>
@@ -165,7 +149,14 @@
       <option name="project" value="LOCAL" />
       <updated>1588508905713</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Complete Laboratory Work 2">
+      <created>1588808703200</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1588808703201</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -178,7 +169,8 @@
     <MESSAGE value="Test" />
     <MESSAGE value="Complete laboratory work 1" />
     <MESSAGE value="fixfixfix" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixfixfix" />
+    <MESSAGE value="Complete Laboratory Work 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Complete Laboratory Work 2" />
   </component>
   <component name="WindowStateProjectService">
     <state x="276" y="20" key="#Plugins" timestamp="1588533741762">
@@ -220,10 +212,10 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="407" y="119" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1366.738@0.0.1366.738" timestamp="1588688794391" />
-    <state x="416" y="0" key="CommitChangelistDialog2" timestamp="1588508930741">
+    <state x="416" y="0" key="CommitChangelistDialog2" timestamp="1588808702522">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state x="416" y="0" key="CommitChangelistDialog2/0.0.1366.738@0.0.1366.738" timestamp="1588508930741" />
+    <state x="416" y="0" key="CommitChangelistDialog2/0.0.1366.738@0.0.1366.738" timestamp="1588808702522" />
     <state x="585" y="119" key="CommitChangelistDialog2/0.0.1920.1050@0.0.1920.1050" timestamp="1584975464932" />
     <state x="463" y="125" width="440" height="510" key="FileChooserDialogImpl" timestamp="1588778781976">
       <screen x="0" y="0" width="1366" height="738" />
@@ -234,25 +226,25 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="517" y="286" width="356" height="166" key="Github.CreateGistDialog/0.0.1366.738@0.0.1366.738" timestamp="1582624206358" />
-    <state width="1286" height="115" key="GridCell.Tab.0.bottom" timestamp="1588808413183">
+    <state width="1286" height="115" key="GridCell.Tab.0.bottom" timestamp="1588811791686">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1286" height="115" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1588808413183" />
+    <state width="1286" height="115" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1588811791686" />
     <state width="1340" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1587029885367" />
-    <state width="1286" height="115" key="GridCell.Tab.0.center" timestamp="1588808413183">
+    <state width="1286" height="115" key="GridCell.Tab.0.center" timestamp="1588811791686">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1286" height="115" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1588808413183" />
+    <state width="1286" height="115" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1588811791686" />
     <state width="1340" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1587029885367" />
-    <state width="1286" height="115" key="GridCell.Tab.0.left" timestamp="1588808413183">
+    <state width="1286" height="115" key="GridCell.Tab.0.left" timestamp="1588811791686">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1286" height="115" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1588808413183" />
+    <state width="1286" height="115" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1588811791686" />
     <state width="1340" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1587029885366" />
-    <state width="1286" height="115" key="GridCell.Tab.0.right" timestamp="1588808413183">
+    <state width="1286" height="115" key="GridCell.Tab.0.right" timestamp="1588811791686">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1286" height="115" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1588808413183" />
+    <state width="1286" height="115" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1588811791686" />
     <state width="1340" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1587029885367" />
     <state width="1286" height="208" key="GridCell.Tab.1.bottom" timestamp="1588801892663">
       <screen x="0" y="0" width="1366" height="738" />
@@ -283,10 +275,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="780" y="229" key="VCS.ChangeListViewerDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1584975610203" />
-    <state x="393" y="181" key="Vcs.Push.Dialog.v2" timestamp="1588508927207">
+    <state x="393" y="181" key="Vcs.Push.Dialog.v2" timestamp="1588808707862">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state x="393" y="181" key="Vcs.Push.Dialog.v2/0.0.1366.738@0.0.1366.738" timestamp="1588508927207" />
+    <state x="393" y="181" key="Vcs.Push.Dialog.v2/0.0.1366.738@0.0.1366.738" timestamp="1588808707862" />
     <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1584975471156" />
     <state width="700" height="500" key="XDebugger.FullValuePopup" timestamp="1585736083344">
       <screen x="0" y="0" width="1920" height="1050" />
