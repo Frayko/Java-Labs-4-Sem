@@ -54,7 +54,6 @@ public class Application extends JFrame {
         control_panel.setBackground(Color.PINK);
 
         modalInfoDialog = new ModalInfoDialog();
-        modalInfoDialog.setVisible(false);
 
         this.setJMenuBar(menu = new Menu());
 
@@ -336,7 +335,7 @@ public class Application extends JFrame {
             pause();
         else if(habitat.getStatus() == Status.ПАУЗА) {
             continue_();
-            modalInfoDialog.setVisible(false);
+            modalInfoDialog.dispose();
         }
     }
 
@@ -347,7 +346,7 @@ public class Application extends JFrame {
                 modalInfoDialog.setVisible(true);
                 modalInfoDialog.setAlwaysOnTop(true);
             } else {
-                modalInfoDialog.setVisible(false);
+                modalInfoDialog.dispose();
                 stopped();
             }
         }
@@ -449,7 +448,7 @@ public class Application extends JFrame {
 
             this.add(info_area);
             this.add(panel_buttons);
-            this.setVisible(true);
+            this.setVisible(false);
         }
 
         public void update_metrics() {
