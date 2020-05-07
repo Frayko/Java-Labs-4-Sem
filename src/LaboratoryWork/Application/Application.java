@@ -21,7 +21,6 @@ public class Application extends JFrame {
     private final JRadioButton show_timer_radio_button;
     private final JRadioButton hide_timer_radio_button;
 
-    private final ModalInfoDialog modalInfoDialog;
     private final Menu menu;
     private final StatusPanel statusPanel;
     private final TimerPanel timerPanel;
@@ -53,8 +52,6 @@ public class Application extends JFrame {
         control_panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         control_panel.setBackground(Color.PINK);
 
-        modalInfoDialog = new ModalInfoDialog();
-
         this.setJMenuBar(menu = new Menu());
 
         statusPanel = new StatusPanel();
@@ -73,7 +70,12 @@ public class Application extends JFrame {
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_B -> start();
-                    case KeyEvent.VK_E -> stop();
+                    case KeyEvent.VK_E -> {
+                        if(isAllowModalInfo)
+                            new ModalInfoDialog();
+                        else
+                            stop();
+                    }
                     case KeyEvent.VK_T -> show_hide_timer();
                     case KeyEvent.VK_P -> pause_continue();
                     case KeyEvent.VK_ESCAPE -> System.exit(0);
@@ -101,7 +103,10 @@ public class Application extends JFrame {
         stop_button.setBackground(Color.lightGray);
         stop_button.setEnabled(false);
         stop_button.addActionListener(actionEvent -> {
-            stop();
+            if(isAllowModalInfo)
+                new ModalInfoDialog();
+            else
+                stop();
             requestFocus(false);
         });
         stop_button.setToolTipText("Остановка симуляции");
@@ -335,32 +340,19 @@ public class Application extends JFrame {
             pause();
         else if(habitat.getStatus() == Status.ПАУЗА) {
             continue_();
-            modalInfoDialog.dispose();
         }
     }
 
     private void stop() {
         if(habitat.getStatus() != Status.ВЫКЛ) {
-            if (isAllowModalInfo) {
-                modalInfoDialog.update_metrics();
-                modalInfoDialog.setVisible(true);
-                modalInfoDialog.setAlwaysOnTop(true);
-            } else {
-                modalInfoDialog.dispose();
-                stopped();
-            }
+            habitat.end_simulation();
+            start_button.setEnabled(true);
+            menu.start_item.setEnabled(true);
+            stop_button.setEnabled(false);
+            menu.stop_item.setEnabled(false);
+            pause_button.setEnabled(false);
+            menu.pause_item.setEnabled(false);
         }
-    }
-
-    private void stopped() {
-        pause_button.setText("Приостановить");
-        habitat.end_simulation();
-        start_button.setEnabled(true);
-        menu.start_item.setEnabled(true);
-        stop_button.setEnabled(false);
-        menu.stop_item.setEnabled(false);
-        pause_button.setEnabled(false);
-        menu.pause_item.setEnabled(false);
     }
 
     private void show_hide_timer() {
@@ -382,6 +374,8 @@ public class Application extends JFrame {
         private ModalInfoDialog () {
             int dialog_window_width = 250;
             int dialog_window_height = 220;
+
+            pause();
 
             this.setTitle("Результаты симуляции");
             this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/attention.png").getImage());
@@ -425,7 +419,7 @@ public class Application extends JFrame {
             panel_buttons.add(ok_button);
             panel_buttons.add(cancel_button);
 
-            ok_button.addActionListener(actionEvent -> { stopped(); dispose(); });
+            ok_button.addActionListener(actionEvent -> { stop(); dispose(); });
             cancel_button.addActionListener(actionEvent -> { continue_(); dispose(); });
 
             this.setFocusable(true);
@@ -435,7 +429,7 @@ public class Application extends JFrame {
                 public void keyPressed(KeyEvent e) {
                     switch (e.getKeyCode()) {
                         case KeyEvent.VK_ENTER -> {
-                            stopped();
+                            stop();
                             dispose();
                         }
                         case KeyEvent.VK_ESCAPE -> {
@@ -446,14 +440,11 @@ public class Application extends JFrame {
                 }
             });
 
+            this.setModalityType(ModalityType.APPLICATION_MODAL);
+
             this.add(info_area);
             this.add(panel_buttons);
-            this.setVisible(false);
-        }
-
-        public void update_metrics() {
-            info_area.setText(habitat.getMetrics());
-            pause();
+            this.setVisible(true);
         }
     }
 
@@ -473,7 +464,12 @@ public class Application extends JFrame {
 
             stop_item = new JMenuItem("Посмотреть информацию");
             stop_item.setEnabled(false);
-            stop_item.addActionListener(actionEvent -> stop());
+            stop_item.addActionListener(actionEvent -> {
+                if(isAllowModalInfo)
+                    new ModalInfoDialog();
+                else
+                    stop();
+            });
             stop_item.setToolTipText("Остановка симуляции");
             main_menu.add(stop_item);
 
