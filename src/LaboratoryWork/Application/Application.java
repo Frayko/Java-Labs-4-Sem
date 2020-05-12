@@ -4,26 +4,24 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import LaboratoryWork.Habitat.Fish;
+import LaboratoryWork.Habitat.FishArray;
 import LaboratoryWork.Habitat.Habitat;
+import LaboratoryWork.Habitat.Objects.GoldenFish;
 import LaboratoryWork.Habitat.Status;
 
 public class Application extends JFrame {
     private final int window_width;
     private final int window_height;
 
-    private final JButton start_button;
-    private final JButton stop_button;
-    private final JButton pause_button;
-
-    private final JRadioButton show_timer_radio_button;
-    private final JRadioButton hide_timer_radio_button;
-
     private final Menu menu;
     private final StatusPanel statusPanel;
     private final TimerPanel timerPanel;
+    private final ControlPanel controlPanel;
 
     private boolean isVisible = true;
     private boolean isAllowModalInfo = true;
@@ -38,32 +36,22 @@ public class Application extends JFrame {
         this.setTitle("Генератор рыбок");
         this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/window_icon.png").getImage());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(new BorderLayout());
         this.setBounds(50, 50, window_width, window_height);
         this.setBackground(Color.white);
         this.setLocationRelativeTo(null);
         this.setFocusable(true);
-        this.setResizable(true);
+        this.setResizable(false);
 
-        JPanel scene = new JPanel(new BorderLayout());
-
-        JPanel control_panel = new JPanel(new GridLayout());
-        Dimension control_panel_size = new Dimension(240, getHeight());
-        control_panel.setPreferredSize(control_panel_size);
-        control_panel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        control_panel.setBackground(Color.PINK);
-
-        this.setJMenuBar(menu = new Menu());
-
+        controlPanel = new ControlPanel();
         statusPanel = new StatusPanel();
         timerPanel = new TimerPanel();
 
-        scene.add(habitat, BorderLayout.CENTER);
-        scene.add(control_panel, BorderLayout.EAST);
-        scene.add(timerPanel, BorderLayout.SOUTH);
-        scene.add(statusPanel, BorderLayout.NORTH);
-        this.add(scene);
-
-        this.setFocusable(true);
+        this.add(habitat, BorderLayout.CENTER);
+        this.add(controlPanel, BorderLayout.EAST);
+        this.add(timerPanel, BorderLayout.SOUTH);
+        this.add(statusPanel, BorderLayout.NORTH);
+        this.setJMenuBar(menu = new Menu());
 
         addKeyListener(new KeyAdapter() {
             @Override
@@ -77,247 +65,23 @@ public class Application extends JFrame {
                             stop();
                     }
                     case KeyEvent.VK_T -> show_hide_timer();
-                    case KeyEvent.VK_P -> pause_continue();
+                    case KeyEvent.VK_P -> resume();
                     case KeyEvent.VK_ESCAPE -> System.exit(0);
                 }
             }
         });
-
-
-        //КНОПКИ
-        Dimension button_size = new Dimension(180,30);
-
-        start_button = new JButton("Начать");
-        start_button.setPreferredSize(button_size);
-        start_button.setBackground(Color.lightGray);
-        start_button.setEnabled(true);
-        start_button.addActionListener(actionEvent -> {
-            start();
-            requestFocus(false);
-        });
-        start_button.setToolTipText("Запуск симуляции");
-        control_panel.add(start_button);
-
-        stop_button = new JButton("Посмотреть информацию");
-        stop_button.setPreferredSize(button_size);
-        stop_button.setBackground(Color.lightGray);
-        stop_button.setEnabled(false);
-        stop_button.addActionListener(actionEvent -> {
-            if(isAllowModalInfo)
-                new ModalInfoDialog();
-            else
-                stop();
-            requestFocus(false);
-        });
-        stop_button.setToolTipText("Остановка симуляции");
-        control_panel.add(stop_button);
-
-        pause_button = new JButton("Приостановить");
-        pause_button.setPreferredSize(button_size);
-        pause_button.setBackground(Color.lightGray);
-        pause_button.setEnabled(false);
-        pause_button.addActionListener(actionEvent -> {
-            pause_continue();
-            requestFocus(false);
-        });
-        pause_button.setToolTipText("Пауза");
-        control_panel.add(pause_button);
-
-
-        //ЧЕКБОКС
-        JCheckBox modal_info = new JCheckBox("Показывать информацию");
-        modal_info.setSelected(true);
-        modal_info.setContentAreaFilled(false);
-        modal_info.setBackground(control_panel.getBackground());
-        modal_info.addActionListener(actionEvent -> {
-            isAllowModalInfo = !isAllowModalInfo;
-            if(isAllowModalInfo) {
-                stop_button.setText("Посмотреть информацию");
-                menu.stop_item.setText("Посмотреть информацию");
-            }
-            else {
-                stop_button.setText("Остановить");
-                menu.stop_item.setText("Остановить");
-            }
-            requestFocus(false);
-        });
-        modal_info.setToolTipText("Включить/Выключить отображение информации");
-        control_panel.add(modal_info);
-
-
-        //РАДИО-КНОПКА
-        JPanel timer_radio_button_panel = new JPanel(new GridLayout(2,1));
-        timer_radio_button_panel.setBackground(control_panel.getBackground());
-        control_panel.add(timer_radio_button_panel);
-
-        show_timer_radio_button = new JRadioButton("Показывать время симуляции");
-        show_timer_radio_button.setBackground(control_panel.getBackground());
-        show_timer_radio_button.addActionListener(actionEvent -> {
-            isVisible = true;
-            timerPanel.setVisible(true);
-            requestFocus(false);
-        });
-        timer_radio_button_panel.add(show_timer_radio_button);
-
-        hide_timer_radio_button = new JRadioButton("Скрывать время симуляции");
-        hide_timer_radio_button.setBackground(control_panel.getBackground());
-        hide_timer_radio_button.addActionListener(actionEvent -> {
-            isVisible = false;
-            timerPanel.setVisible(false);
-            requestFocus(false);
-        });
-        timer_radio_button_panel.add(hide_timer_radio_button);
-
-        ButtonGroup timer_radio_buttons = new ButtonGroup();
-        timer_radio_buttons.add(show_timer_radio_button);
-        timer_radio_buttons.add(hide_timer_radio_button);
-        timer_radio_buttons.setSelected(show_timer_radio_button.getModel(), true);
-
-
-        //ПЕРИОД РОЖДЕНИЯ
-        JPanel period_panel = new JPanel(new GridLayout(2,1));
-        period_panel.setBackground(control_panel.getBackground());
-        control_panel.add(period_panel);
-
-        JLabel period_title = new JLabel("Период рождения");
-        period_title.setPreferredSize(new Dimension(237, 30));
-        period_title.setToolTipText("Время в секундах / 10");
-        period_panel.add(period_title);
-
-        JPanel period_edit_panel = new JPanel();
-        period_edit_panel.setLayout(new BoxLayout(period_edit_panel, BoxLayout.X_AXIS));
-        period_edit_panel.setBackground(control_panel.getBackground());
-        period_panel.add(period_edit_panel);
-
-        JPanel golden_period_panel = new JPanel();
-        golden_period_panel.setBackground(control_panel.getBackground());
-        period_edit_panel.add(golden_period_panel);
-
-        JLabel golden_label = new JLabel("Золотой:");
-        golden_period_panel.add(golden_label);
-
-        JTextField golden_text_field = new JTextField(Integer.toString(habitat.getN1()));
-        golden_text_field.setPreferredSize(new Dimension(30, 20));
-        golden_text_field.addActionListener(actionEvent -> {
-            try {
-                habitat.setN1(Integer.parseInt(golden_text_field.getText()));
-                requestFocus(false);
-                if(habitat.getN1() < 0) {
-                    throw new Exception();
-                }
-            }
-            catch (Exception e) {
-                habitat.setN1(5);
-                golden_text_field.setText(Integer.toString(habitat.getN1()));
-                JOptionPane.showMessageDialog(null,
-                        "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        golden_period_panel.add(golden_text_field);
-
-        JPanel guppies_period_panel = new JPanel();
-        guppies_period_panel.setBackground(control_panel.getBackground());
-        period_edit_panel.add(guppies_period_panel);
-
-        JLabel period_guppies_label = new JLabel("Гуппи:");
-        guppies_period_panel.add(period_guppies_label);
-
-        JTextField guppies_text_field = new JTextField(Integer.toString(habitat.getN2()));
-        guppies_text_field.setPreferredSize(new Dimension(30, 20));
-        guppies_text_field.addActionListener(actionEvent -> {
-            try {
-                habitat.setN2(Integer.parseInt(guppies_text_field.getText()));
-                requestFocus(false);
-                if(habitat.getN2() < 0) {
-                    throw new Exception();
-                }
-            }
-            catch (Exception e) {
-                habitat.setN1(3);
-                guppies_text_field.setText(Integer.toString(habitat.getN1()));
-                JOptionPane.showMessageDialog(null,
-                        "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        guppies_period_panel.add(guppies_text_field);
-
-
-        //ВЕРОЯТНОСТЬ РОЖДЕНИЯ
-        JPanel probably_panel = new JPanel(new GridLayout(3,1));
-        probably_panel.setBackground(control_panel.getBackground());
-        control_panel.add(probably_panel);
-
-        String[] items = {
-                "0.0",
-                "0.1",
-                "0.2",
-                "0.3",
-                "0.4",
-                "0.5",
-                "0.6",
-                "0.7",
-                "0.8",
-                "0.9",
-                "1.0"
-        };
-
-        JLabel probably_title = new JLabel("Вероятность рождения");
-        probably_title.setPreferredSize(new Dimension(200, 30));
-        probably_title.setToolTipText("Вероятность от 0 до 1. В случае с Гуппи делим цифры на слайдере на 100");
-        probably_panel.add(probably_title);
-
-
-        //ВЕРОЯТНОСТЬ РОЖДЕНИЯ ЗОЛОТЫХ РЫБОК
-        JPanel probably_golden_panel = new JPanel();
-        probably_golden_panel.setLayout(new BoxLayout(probably_golden_panel, BoxLayout.X_AXIS));
-        probably_golden_panel.setBackground(control_panel.getBackground());
-        probably_panel.add(probably_golden_panel);
-
-        JLabel probably_golden_label = new JLabel("Золотых: ");
-        probably_golden_panel.add(probably_golden_label);
-
-        JComboBox<String> probably_golden_combo_box = new JComboBox<>(items);
-        probably_golden_combo_box.setSelectedItem(Double.toString(habitat.getP1()));
-        probably_golden_combo_box.addActionListener(actionEvent -> {
-            habitat.setP1(Double.parseDouble(items[probably_golden_combo_box.getSelectedIndex()]));
-            requestFocus(false);
-        });
-        probably_golden_panel.add(probably_golden_combo_box);
-
-        //ВЕРОЯТНОСТЬ РОЖДЕНИЯ РЫБОК ГУППИ
-        JPanel probably_guppies_panel = new JPanel();
-        probably_guppies_panel.setLayout(new BoxLayout(probably_guppies_panel, BoxLayout.X_AXIS));
-        probably_guppies_panel.setBackground(control_panel.getBackground());
-        probably_panel.add(probably_guppies_panel);
-
-        JLabel probably_guppies_label = new JLabel("Гуппи: ");
-        probably_guppies_panel.add(probably_guppies_label);
-
-
-        JSlider probably_guppies_slider = new JSlider(0,100);
-        probably_guppies_slider.setBackground(control_panel.getBackground());
-        double probably_guppies_value = habitat.getP2() * 100.;
-        probably_guppies_slider.setValue((int) probably_guppies_value);
-        probably_guppies_slider.setMajorTickSpacing(10);
-        probably_guppies_slider.setPaintLabels(true);
-        probably_guppies_slider.setPaintTicks(true);
-        probably_guppies_slider.addChangeListener(actionEvent -> {
-            habitat.setP2(probably_guppies_slider.getValue() / 100.);
-            requestFocus(false);
-        });
-        probably_guppies_panel.add(probably_guppies_slider);
-
         this.setVisible(true);
     }
 
     private void start() {
         if(habitat.getStatus() == Status.ВЫКЛ) {
             habitat.begin_simulation();
-            start_button.setEnabled(false);
+            controlPanel.buttonPanel.start_button.setEnabled(false);
             menu.start_item.setEnabled(false);
-            stop_button.setEnabled(true);
+            controlPanel.buttonPanel.show_objects.setEnabled(true);
+            controlPanel.buttonPanel.stop_button.setEnabled(true);
             menu.stop_item.setEnabled(true);
-            pause_button.setEnabled(true);
+            controlPanel.buttonPanel.pause_button.setEnabled(true);
             menu.pause_item.setEnabled(true);
             runTimer();
         }
@@ -325,17 +89,17 @@ public class Application extends JFrame {
 
     private void pause() {
         habitat.pause_simulation();
-        pause_button.setText("Продолжить");
+        controlPanel.buttonPanel.pause_button.setText("Продолжить");
         menu.pause_item.setText("Продолжить");
     }
 
     private void continue_() {
         habitat.continue_simulation();
-        pause_button.setText("Приостановить");
-        menu.pause_item.setText("Приостановить");
+        controlPanel.buttonPanel.pause_button.setText("Пауза");
+        menu.pause_item.setText("Пауза");
     }
 
-    private void pause_continue() {
+    private void resume() {
         if(habitat.getStatus() == Status.ВКЛ)
             pause();
         else if(habitat.getStatus() == Status.ПАУЗА) {
@@ -346,12 +110,15 @@ public class Application extends JFrame {
     private void stop() {
         if(habitat.getStatus() != Status.ВЫКЛ) {
             habitat.end_simulation();
-            start_button.setEnabled(true);
+            controlPanel.buttonPanel.start_button.setEnabled(true);
             menu.start_item.setEnabled(true);
-            stop_button.setEnabled(false);
+            controlPanel.buttonPanel.show_objects.setEnabled(false);
+            controlPanel.buttonPanel.stop_button.setEnabled(false);
             menu.stop_item.setEnabled(false);
-            pause_button.setEnabled(false);
+            controlPanel.buttonPanel.pause_button.setEnabled(false);
             menu.pause_item.setEnabled(false);
+            controlPanel.buttonPanel.pause_button.setText("Пауза");
+            menu.pause_item.setText("Пауза");
         }
     }
 
@@ -359,12 +126,413 @@ public class Application extends JFrame {
         isVisible = !isVisible;
         timerPanel.setVisible(isVisible);
         if(isVisible) {
-            show_timer_radio_button.setSelected(true);
-            hide_timer_radio_button.setSelected(false);
+            controlPanel.radioButtonPanel.show_timer_button.setSelected(true);
+            controlPanel.radioButtonPanel.hide_timer_button.setSelected(false);
         }
         else {
-            hide_timer_radio_button.setSelected(true);
-            show_timer_radio_button.setSelected(false);
+            controlPanel.radioButtonPanel.hide_timer_button.setSelected(true);
+            controlPanel.radioButtonPanel.show_timer_button.setSelected(false);
+        }
+    }
+
+    private class ControlPanel extends JPanel {
+        ButtonPanel buttonPanel;
+        CheckBoxPanel checkBoxPanel;
+        RadioButtonPanel radioButtonPanel;
+        TextFieldPanel textFieldPanel;
+        ProbablyPanel probablyPanel;
+
+        Color background = Color.PINK;
+
+        public ControlPanel() {
+            setLayout(new GridBagLayout());
+            setBackground(background);
+            setPreferredSize(new Dimension(250, getHeight()));
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.weightx = 1;
+            gbc.weighty = 1;
+            gbc.insets = new Insets(2,2,2,2);
+
+            add(textFieldPanel = new TextFieldPanel(), gbc);
+            gbc.gridy++;
+            add(probablyPanel = new ProbablyPanel(), gbc);
+            gbc.gridy++;
+            add(radioButtonPanel = new RadioButtonPanel(), gbc);
+            gbc.gridy++;
+            add(checkBoxPanel = new CheckBoxPanel(), gbc);
+            gbc.gridy++;
+            gbc.gridy++;
+            add(buttonPanel = new ButtonPanel(), gbc);
+        }
+
+        private class ButtonPanel extends JPanel {
+            private final JButton start_button;
+            private final JButton stop_button;
+            private final JButton pause_button;
+            private final JButton show_objects;
+
+            ButtonPanel() {
+                setLayout(new GridLayout(4,1));
+                setBackground(background);
+
+                Dimension button_size = new Dimension(220,40);
+
+                start_button = new JButton("Начать");
+                start_button.setPreferredSize(button_size);
+                start_button.setBackground(Color.lightGray);
+                start_button.setEnabled(true);
+                start_button.addActionListener(actionEvent -> {
+                    start();
+                    requestFocus(false);
+                });
+                start_button.setToolTipText("Запуск симуляции");
+
+                stop_button = new JButton("Закончить");
+                stop_button.setPreferredSize(button_size);
+                stop_button.setBackground(Color.lightGray);
+                stop_button.setEnabled(false);
+                stop_button.addActionListener(actionEvent -> {
+                    if(isAllowModalInfo)
+                        new ModalInfoDialog();
+                    else
+                        stop();
+                    requestFocus(false);
+                });
+                stop_button.setToolTipText("Остановка симуляции");
+
+                show_objects = new JButton("Текущие объекты");
+                show_objects.setPreferredSize(button_size);
+                show_objects.setBackground(Color.lightGray);
+                show_objects.setEnabled(false);
+                show_objects.addActionListener(actionEvent -> {
+                    pause();
+
+                    StringBuilder buf = new StringBuilder();
+
+                    for(Fish fish : FishArray.getFishArray().getList()) {
+                        for(Map.Entry<Integer, Double> entry : FishArray.getFishArray().getMap().entrySet()) {
+                            if(entry.getKey() == fish.hashCode()) {
+                                buf.append("Тип рыбы: "); buf.append(fish instanceof GoldenFish ? "Золотая" : "Гуппи    ");
+                                buf.append("   Время рождения(сек): "); buf.append(entry.getValue() / 10.);
+                                buf.append("   id рыбы: "); buf.append(entry.getKey());
+                                buf.append("\n");
+                            }
+                        }
+                    }
+
+                    String[] options = { "ОК" };
+                    JOptionPane.showOptionDialog(
+                            null,
+                            buf.toString(),
+                            "Текущие объекты",
+                            JOptionPane.DEFAULT_OPTION,
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            options,
+                            options[0]
+                    );
+                    resume();
+                });
+                show_objects.setToolTipText("Показать все объекты");
+
+                pause_button = new JButton("Пауза");
+                pause_button.setPreferredSize(button_size);
+                pause_button.setBackground(Color.lightGray);
+                pause_button.setEnabled(false);
+                pause_button.addActionListener(actionEvent -> {
+                    resume();
+                    requestFocus(false);
+                });
+                pause_button.setToolTipText("Пауза");
+
+                add(start_button);
+                add(show_objects);
+                add(pause_button);
+                add(stop_button);
+            }
+        }
+
+        private class CheckBoxPanel extends JPanel {
+            CheckBoxPanel() {
+                setLayout(new GridLayout(1,1));
+                setBackground(background);
+
+                JCheckBox modal_info_checkbox = new JCheckBox("Показывать информацию после остановки");
+                modal_info_checkbox.setSelected(true);
+                modal_info_checkbox.setBackground(background);
+                modal_info_checkbox.addActionListener(actionEvent -> {
+                    isAllowModalInfo = !isAllowModalInfo;
+                    requestFocus(false);
+                });
+                add(modal_info_checkbox);
+                modal_info_checkbox.setToolTipText("Включить/Выключить отображение информации");
+            }
+        }
+
+        private class RadioButtonPanel extends JPanel {
+            private final JRadioButton show_timer_button;
+            private final JRadioButton hide_timer_button;
+
+            RadioButtonPanel() {
+                setLayout(new GridLayout(2,1));
+                setBackground(background);
+
+                show_timer_button = new JRadioButton("Показывать время симуляции");
+                show_timer_button.setBackground(background);
+                show_timer_button.addActionListener(actionEvent -> {
+                    isVisible = true;
+                    timerPanel.setVisible(true);
+                    requestFocus(false);
+                });
+                add(show_timer_button);
+
+                hide_timer_button = new JRadioButton("Скрывать время симуляции");
+                hide_timer_button.setBackground(background);
+                hide_timer_button.addActionListener(actionEvent -> {
+                    isVisible = false;
+                    timerPanel.setVisible(false);
+                    requestFocus(false);
+                });
+                add(hide_timer_button);
+
+                ButtonGroup timer_buttons = new ButtonGroup();
+                timer_buttons.add(show_timer_button);
+                timer_buttons.add(hide_timer_button);
+                timer_buttons.setSelected(show_timer_button.getModel(), true);
+            }
+        }
+
+        private class TextFieldPanel extends JPanel {
+            private final JTextField golden_text_field_N;
+            private final JTextField golden_text_field_TTL;
+            private final JTextField guppies_text_field_N;
+            private final JTextField guppies_text_field_TTL;
+
+            public TextFieldPanel() {
+                setLayout(new GridBagLayout());
+                setBackground(background);
+                setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.anchor = GridBagConstraints.CENTER;
+                c.insets = new Insets(2,2,2,2);
+
+                //Период рождения
+                c.gridwidth = 7;
+                JLabel periodTime = new JLabel("Период между рождениями");
+                periodTime.setFont(new Font("Open Sans", Font.BOLD, 14));
+                add(periodTime, c);
+
+                c.gridy++;
+                c.gridwidth = 1;
+
+                add(new JLabel("Золотых:"), c);
+                c.gridx++;
+                golden_text_field_N = new JTextField(Double.toString(habitat.getN1()));
+                golden_text_field_N.setHorizontalAlignment(JTextField.RIGHT);
+                golden_text_field_N.setPreferredSize(new Dimension(30, 20));
+                golden_text_field_N.addActionListener(actionEvent -> {
+                    try {
+                        habitat.setN1(Double.parseDouble(golden_text_field_N.getText()));
+                        requestFocus(false);
+                        if(habitat.getN1() < 0) {
+                            throw new Exception();
+                        }
+                        golden_text_field_N.setText(Double.toString(habitat.getN1()));
+                    }
+                    catch (Exception e) {
+                        habitat.setN1(0.5);
+                        golden_text_field_N.setText(Double.toString(habitat.getN1()));
+                        JOptionPane.showMessageDialog(null,
+                                "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+                add(golden_text_field_N, c);
+                c.gridx++;
+                add(new JLabel("/сек"), c);
+                c.gridx++;
+                add(new JLabel(" | "), c);
+                c.gridx++;
+
+                add(new JLabel("Гуппи:"), c);
+                c.gridx++;
+                guppies_text_field_N = new JTextField(Double.toString(habitat.getN2()));
+                guppies_text_field_N.setHorizontalAlignment(JTextField.RIGHT);
+                guppies_text_field_N.setPreferredSize(new Dimension(30, 20));
+                guppies_text_field_N.addActionListener(actionEvent -> {
+                    try {
+                        habitat.setN2(Double.parseDouble(guppies_text_field_N.getText()));
+                        requestFocus(false);
+                        if(habitat.getN2() < 0) {
+                            throw new Exception();
+                        }
+                        guppies_text_field_N.setText(Double.toString(habitat.getN2()));
+                    }
+                    catch (Exception e) {
+                        habitat.setN1(0.3);
+                        guppies_text_field_N.setText(Double.toString(habitat.getN1()));
+                        JOptionPane.showMessageDialog(null,
+                                "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+                add(guppies_text_field_N, c);
+                c.gridx++;
+                add(new JLabel("/сек"), c);
+                c.gridy++;
+
+                //Время жизни
+                c.gridx = 0;
+                c.gridwidth = 7;
+                JLabel liveTime = new JLabel("Время жизни");
+                liveTime.setFont(new Font("Open Sans", Font.BOLD, 14));
+                add(liveTime, c);
+
+                c.gridy++;
+                c.gridwidth = 1;
+
+                add(new JLabel("Золотых:"), c);
+                c.gridx++;
+                golden_text_field_TTL = new JTextField(Double.toString(habitat.getGoldenTTL()));
+                golden_text_field_TTL.setHorizontalAlignment(JTextField.RIGHT);
+                golden_text_field_TTL.setPreferredSize(new Dimension(30, 20));
+                golden_text_field_TTL.addActionListener(actionEvent -> {
+                    try {
+                        habitat.setGoldenTTL(Double.parseDouble(golden_text_field_TTL.getText()));
+                        requestFocus(false);
+                        if(habitat.getGoldenTTL() < 0) {
+                            throw new Exception();
+                        }
+                        golden_text_field_TTL.setText(Double.toString(habitat.getGoldenTTL()));
+                    }
+                    catch (Exception e) {
+                        habitat.setGoldenTTL(1.0);
+                        golden_text_field_TTL.setText(Double.toString(habitat.getGoldenTTL()));
+                        JOptionPane.showMessageDialog(null,
+                                "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+                add(golden_text_field_TTL, c);
+                c.gridx++;
+                add(new JLabel("сек."), c);
+                c.gridx++;
+                add(new JLabel(" | "), c);
+                c.gridx++;
+
+                add(new JLabel("Гуппи:"), c);
+                c.gridx++;
+                guppies_text_field_TTL = new JTextField(Double.toString(habitat.getGuppiesTTL()));
+                guppies_text_field_TTL.setHorizontalAlignment(JTextField.RIGHT);
+                guppies_text_field_TTL.setPreferredSize(new Dimension(30, 20));
+                guppies_text_field_TTL.addActionListener(actionEvent -> {
+                    try {
+                        habitat.setGuppiesTTL(Double.parseDouble(guppies_text_field_TTL.getText()));
+                        requestFocus(false);
+                        if(habitat.getGuppiesTTL() < 0) {
+                            throw new Exception();
+                        }
+                        guppies_text_field_TTL.setText(Double.toString(habitat.getGuppiesTTL()));
+                    }
+                    catch (Exception e) {
+                        habitat.setGuppiesTTL(2.0);
+                        guppies_text_field_TTL.setText(Double.toString(habitat.getGuppiesTTL()));
+                        JOptionPane.showMessageDialog(null,
+                                "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+                add(guppies_text_field_TTL, c);
+                c.gridx++;
+                add(new JLabel("сек."), c);
+            }
+        }
+
+        private class ProbablyPanel extends JPanel {
+            ComboBoxPanel comboBoxPanel;
+            SliderPanel sliderPanel;
+
+            ProbablyPanel() {
+                setLayout(new GridBagLayout());
+                setBackground(background);
+                setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.anchor = GridBagConstraints.CENTER;
+                c.insets = new Insets(2,2,2,2);
+
+                JLabel probablyBorn = new JLabel("Вероятность рождения [%]");
+                probablyBorn.setFont(new Font("Open Sans", Font.BOLD, 14));
+                add(probablyBorn, c);
+                c.gridy++;
+                add(comboBoxPanel = new ComboBoxPanel(), c);
+                c.gridy++;
+                add(sliderPanel = new SliderPanel(), c);
+            }
+        }
+
+        private class ComboBoxPanel extends JPanel {
+            private final JComboBox<String> golden_combo_box;
+
+            public ComboBoxPanel() {
+                setBackground(background);
+
+                add(new JLabel("Золотых: "));
+
+                golden_combo_box = new JComboBox<>(items);
+                golden_combo_box.setSelectedItem(Integer.toString(habitat.getP1()));
+                golden_combo_box.addActionListener(actionEvent -> {
+                    habitat.setP1(Integer.parseInt(items[golden_combo_box.getSelectedIndex()]));
+                    requestFocus(false);
+                });
+                add(golden_combo_box);
+            }
+
+            String[] items = {
+                    "0",
+                    "10",
+                    "20",
+                    "30",
+                    "40",
+                    "50",
+                    "60",
+                    "70",
+                    "80",
+                    "90",
+                    "100"
+            };
+        }
+
+        private class SliderPanel extends JPanel {
+            private final JSlider guppies_slider;
+
+            public SliderPanel() {
+                setBackground(background);
+
+                add(new JLabel("Гуппи: "));
+
+                guppies_slider = new JSlider(0,100, habitat.getP2());
+                guppies_slider.setBackground(background);
+                guppies_slider.setPreferredSize(new Dimension(170, 50));
+                guppies_slider.setFont(new Font("Times New Roman", Font.PLAIN, 9));
+                guppies_slider.setMajorTickSpacing(10);
+                guppies_slider.setPaintLabels(true);
+                guppies_slider.setName("Гуппи");
+                guppies_slider.setPaintTicks(true);
+                guppies_slider.addChangeListener(actionEvent -> {
+                    habitat.setP2(guppies_slider.getValue());
+                    requestFocus(false);
+                });
+                add(guppies_slider);
+            }
         }
     }
 
@@ -462,7 +630,7 @@ public class Application extends JFrame {
             start_item.setToolTipText("Запуск симуляции");
             main_menu.add(start_item);
 
-            stop_item = new JMenuItem("Посмотреть информацию");
+            stop_item = new JMenuItem("Закончить");
             stop_item.setEnabled(false);
             stop_item.addActionListener(actionEvent -> {
                 if(isAllowModalInfo)
@@ -470,12 +638,12 @@ public class Application extends JFrame {
                 else
                     stop();
             });
-            stop_item.setToolTipText("Остановка симуляции");
+            stop_item.setToolTipText("Окончание симуляции");
             main_menu.add(stop_item);
 
-            pause_item = new JMenuItem("Приостановить");
+            pause_item = new JMenuItem("Пауза");
             pause_item.setEnabled(false);
-            pause_item.addActionListener(actionEvent -> pause_continue());
+            pause_item.addActionListener(actionEvent -> resume());
             pause_item.setToolTipText("Пауза");
             main_menu.add(pause_item);
 
