@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import LaboratoryWork.Habitat.Fish;
-import LaboratoryWork.Habitat.FishArray;
+import LaboratoryWork.Habitat.Fish.Fish;
+import LaboratoryWork.Habitat.Fish.FishArray;
 import LaboratoryWork.Habitat.Habitat;
-import LaboratoryWork.Habitat.Objects.GoldenFish;
+import LaboratoryWork.Habitat.Fish.Objects.GoldenFish;
 import LaboratoryWork.Habitat.Status;
 
 public class Application extends JFrame {
@@ -547,7 +547,7 @@ public class Application extends JFrame {
 
             this.setTitle("Результаты симуляции");
             this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/attention.png").getImage());
-            this.setBackground(Color.LIGHT_GRAY);
+            this.setBackground(Color.white);
             this.setForeground(Color.DARK_GRAY);
             this.setBounds(window_width/2 + dialog_window_width/4,
                         window_height/2 - dialog_window_height/4,

@@ -5,9 +5,18 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.awt.*;
 
+import LaboratoryWork.Habitat.Fish.*;
+import LaboratoryWork.Habitat.Fish.FishAI.BaseAI;
+import LaboratoryWork.Habitat.Fish.FishAI.GoldenFishAI;
+import LaboratoryWork.Habitat.Fish.FishAI.GuppiesFishAI;
+import LaboratoryWork.Habitat.Fish.Objects.GoldenFish;
+import LaboratoryWork.Habitat.Fish.Objects.GuppiesFish;
+
 public class Habitat extends JComponent {
     private long LAST_SPAWN_TIME_GOLDEN;
     private long LAST_SPAWN_TIME_GUPPIES;
+    private GoldenFishAI goldenFishAI;
+    private GuppiesFishAI guppiesFishAI;
     private final FishCreator fishCreator = new FishCreator();
     private Status status = Status.ВЫКЛ;
     private long ticks = 0;
@@ -35,12 +44,14 @@ public class Habitat extends JComponent {
         ticks++;
         int window_width = this.getWidth();
         int window_height = this.getHeight();
+        goldenFishAI.setWindowSize(window_width, window_height);
+        guppiesFishAI.setWindowSize(window_width, window_height);
 
         FishArray.getFishArray().checkTTL(ticks, goldenTTL * 10., guppiesTTL * 10.);
 
         if ((ticks - LAST_SPAWN_TIME_GOLDEN) >= (N1 * (PERIOD / 10.))) {
             LAST_SPAWN_TIME_GOLDEN = ticks;
-            if ((float) Math.random() <= P1 && P1 > 0) {
+            if ((float) Math.random() <= (float) P1 / 100. && P1 > 0) {
                 int x = (int) (Math.random() * (window_width - 100));
                 int y = (int) (Math.random() * (window_height - 70));
                 FishArray.getFishArray().addFish(fishCreator.createFish(FishTypes.GoldenFish, x, y), ticks);
@@ -49,15 +60,22 @@ public class Habitat extends JComponent {
 
         if ((ticks - LAST_SPAWN_TIME_GUPPIES) >= (N2 * (PERIOD / 10.))) {
             LAST_SPAWN_TIME_GUPPIES = ticks;
-            if ((float) Math.random() * 100 <= P2 && P2 > 0) {
+            if ((float) Math.random() <= (float) P2 / 100. && P2 > 0) {
                 int x = (int) (Math.random() * (window_width - 100));
                 int y = (int) (Math.random() * (window_height - 70));
                 FishArray.getFishArray().addFish(fishCreator.createFish(FishTypes.GuppiesFish, x, y), ticks);
             }
         }
+
+        goldenFishAI.setDirection(2,0);
+        guppiesFishAI.setDirection(0,2);
     }
 
     public void begin_simulation() {
+        goldenFishAI = new GoldenFishAI();
+        guppiesFishAI = new GuppiesFishAI();
+        goldenFishAI.start();
+        guppiesFishAI.start();
         status = Status.ВКЛ;
         startTimer();
         LAST_SPAWN_TIME_GOLDEN = 0;
@@ -66,6 +84,8 @@ public class Habitat extends JComponent {
 
     public void end_simulation() {
         status = Status.ВЫКЛ;
+        goldenFishAI.interrupt();
+        guppiesFishAI.interrupt();
         timer.cancel();
         ticks = 0;
         fishCreator.resetFishes();
@@ -75,11 +95,15 @@ public class Habitat extends JComponent {
 
     public void pause_simulation() {
         status = Status.ПАУЗА;
+        goldenFishAI.pause();
+        guppiesFishAI.pause();
         timer.cancel();
     }
 
     public void continue_simulation() {
         status = Status.ВКЛ;
+        goldenFishAI.resume_();
+        guppiesFishAI.resume_();
         startTimer();
     }
 
