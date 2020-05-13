@@ -15,6 +15,7 @@ import LaboratoryWork.Habitat.Fish.Objects.GoldenFish;
 import LaboratoryWork.Habitat.Status;
 
 public class Application extends JFrame {
+    Dimension screenSize = getToolkit().getScreenSize();
     private final int window_width;
     private final int window_height;
 
@@ -39,7 +40,9 @@ public class Application extends JFrame {
         this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/window_icon.png").getImage());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
-        this.setBounds(50, 50, window_width, window_height);
+        this.setBounds(screenSize.width/2 - window_width/2,
+                       screenSize.height/2 - window_height/2,
+                          window_width, window_height);
         this.setBackground(Color.white);
         this.setLocationRelativeTo(null);
         this.setFocusable(true);
@@ -706,9 +709,9 @@ public class Application extends JFrame {
             this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/attention.png").getImage());
             this.setBackground(Color.white);
             this.setForeground(Color.DARK_GRAY);
-            this.setBounds(window_width/2 + dialog_window_width/4,
-                        window_height/2 - dialog_window_height/4,
-                        dialog_window_width, dialog_window_height);
+            this.setBounds(screenSize.width/2 - dialog_window_width/2,
+                           screenSize.height/2 - dialog_window_height/2,
+                              dialog_window_width, dialog_window_height);
             this.setLayout(new GridLayout(2,1));
             this.setResizable(false);
 
