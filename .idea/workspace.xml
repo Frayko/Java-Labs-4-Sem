@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="Fix">
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishAI/BaseAI.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishAI/GoldenFishAI.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishAI/GuppiesFishAI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="fix">
+      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Fish.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishArray.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishCreator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishTypes.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/IBehaviour.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GoldenFish.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GuppiesFish.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/FishArray.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/FishCreator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/FishTypes.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/IBehaviour.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Objects/GoldenFish.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Objects/GuppiesFish.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,6 +143,7 @@
       <workItem from="1587472028722" duration="7154000" />
       <workItem from="1587818069932" duration="8000" />
       <workItem from="1587997096209" duration="15400000" />
+      <workItem from="1589353596629" duration="1604000" />
     </task>
     <task id="LOCAL-00001" summary="Test">
       <created>1584975465495</created>
@@ -169,7 +164,8 @@
     </ignored-roots>
     <MESSAGE value="Test" />
     <MESSAGE value="Complete laboratory work 1" />
-    <option name="LAST_COMMIT_MESSAGE" value="Complete laboratory work 1" />
+    <MESSAGE value="fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix" />
   </component>
   <component name="WindowStateProjectService">
     <state x="387" y="40" key="#Project_Structure" timestamp="1587026675711">
@@ -203,11 +199,11 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="496" y="187" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.738@0.0.1366.738" timestamp="1587481140399" />
-    <state x="416" y="0" key="CommitChangelistDialog2" timestamp="1588090752937">
-      <screen x="0" y="0" width="1366" height="738" />
+    <state x="585" y="119" key="CommitChangelistDialog2" timestamp="1589355141202">
+      <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="416" y="0" key="CommitChangelistDialog2/0.0.1366.738@0.0.1366.738" timestamp="1588090752937" />
-    <state x="585" y="119" key="CommitChangelistDialog2/0.0.1920.1050@0.0.1920.1050" timestamp="1584975464932" />
+    <state x="585" y="119" key="CommitChangelistDialog2/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141202" />
     <state x="521" y="159" width="440" height="510" key="FileChooserDialogImpl" timestamp="1589301741331">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -217,26 +213,26 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="517" y="286" width="356" height="166" key="Github.CreateGistDialog/0.0.1366.738@0.0.1366.738" timestamp="1582624206358" />
-    <state width="1340" height="328" key="GridCell.Tab.0.bottom" timestamp="1589316317062">
+    <state width="1340" height="266" key="GridCell.Tab.0.bottom" timestamp="1589355141249">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="643" height="124" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1588090753047" />
-    <state width="1340" height="328" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1589316317062" />
-    <state width="1340" height="328" key="GridCell.Tab.0.center" timestamp="1589316317061">
+    <state width="1340" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141249" />
+    <state width="1340" height="266" key="GridCell.Tab.0.center" timestamp="1589355141249">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="643" height="124" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1588090753047" />
-    <state width="1340" height="328" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1589316317061" />
-    <state width="1340" height="328" key="GridCell.Tab.0.left" timestamp="1589316317061">
+    <state width="1340" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141249" />
+    <state width="1340" height="266" key="GridCell.Tab.0.left" timestamp="1589355141249">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="643" height="124" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1588090753037" />
-    <state width="1340" height="328" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1589316317061" />
-    <state width="1340" height="328" key="GridCell.Tab.0.right" timestamp="1589316317062">
+    <state width="1340" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141249" />
+    <state width="1340" height="266" key="GridCell.Tab.0.right" timestamp="1589355141249">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="643" height="124" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1588090753047" />
-    <state width="1340" height="328" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1589316317062" />
+    <state width="1340" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141249" />
     <state width="1340" height="328" key="GridCell.Tab.1.bottom" timestamp="1589316317062">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -279,6 +275,10 @@
     </state>
     <state x="379" y="194" key="com.intellij.ide.util.TipDialog/0.0.1366.738@0.0.1366.738" timestamp="1582620770309" />
     <state x="533" y="276" key="com.intellij.ide.util.TipDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1587123164906" />
+    <state x="789" y="431" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1589354002624">
+      <screen x="0" y="0" width="1920" height="1050" />
+    </state>
+    <state x="789" y="431" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1050@0.0.1920.1050" timestamp="1589354002624" />
     <state x="521" y="261" width="877" height="602" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1585044903323">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
