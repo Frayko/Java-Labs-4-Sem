@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="fix">
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Fish.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishArray.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishCreator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishTypes.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/IBehaviour.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GoldenFish.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GuppiesFish.java" afterDir="false" />
+    <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Fish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Fish.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GoldenFish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GoldenFish.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GuppiesFish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GuppiesFish.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,7 +141,9 @@
       <workItem from="1587472028722" duration="7154000" />
       <workItem from="1587818069932" duration="8000" />
       <workItem from="1587997096209" duration="15400000" />
-      <workItem from="1589353596629" duration="1604000" />
+      <workItem from="1589353596629" duration="1627000" />
+      <workItem from="1589355250169" duration="30000" />
+      <workItem from="1589356292837" duration="9012000" />
     </task>
     <task id="LOCAL-00001" summary="Test">
       <created>1584975465495</created>
@@ -152,7 +152,14 @@
       <option name="project" value="LOCAL" />
       <updated>1584975465495</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="fix">
+      <created>1589355215197</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1589355215197</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -199,11 +206,11 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="496" y="187" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1366.738@0.0.1366.738" timestamp="1587481140399" />
-    <state x="585" y="119" key="CommitChangelistDialog2" timestamp="1589355141202">
+    <state x="585" y="119" key="CommitChangelistDialog2" timestamp="1589355214663">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="416" y="0" key="CommitChangelistDialog2/0.0.1366.738@0.0.1366.738" timestamp="1588090752937" />
-    <state x="585" y="119" key="CommitChangelistDialog2/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141202" />
+    <state x="585" y="119" key="CommitChangelistDialog2/0.0.1920.1050@0.0.1920.1050" timestamp="1589355214663" />
     <state x="521" y="159" width="440" height="510" key="FileChooserDialogImpl" timestamp="1589301741331">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -213,26 +220,26 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="517" y="286" width="356" height="166" key="Github.CreateGistDialog/0.0.1366.738@0.0.1366.738" timestamp="1582624206358" />
-    <state width="1340" height="266" key="GridCell.Tab.0.bottom" timestamp="1589355141249">
+    <state width="1340" height="266" key="GridCell.Tab.0.bottom" timestamp="1589365225574">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="643" height="124" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1588090753047" />
-    <state width="1340" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141249" />
-    <state width="1340" height="266" key="GridCell.Tab.0.center" timestamp="1589355141249">
+    <state width="1340" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1589365225574" />
+    <state width="1340" height="266" key="GridCell.Tab.0.center" timestamp="1589365225574">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="643" height="124" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1588090753047" />
-    <state width="1340" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141249" />
-    <state width="1340" height="266" key="GridCell.Tab.0.left" timestamp="1589355141249">
+    <state width="1340" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1589365225574" />
+    <state width="1340" height="266" key="GridCell.Tab.0.left" timestamp="1589365225574">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="643" height="124" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1588090753037" />
-    <state width="1340" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141249" />
-    <state width="1340" height="266" key="GridCell.Tab.0.right" timestamp="1589355141249">
+    <state width="1340" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1589365225574" />
+    <state width="1340" height="266" key="GridCell.Tab.0.right" timestamp="1589365225574">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state width="643" height="124" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1588090753047" />
-    <state width="1340" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1589355141249" />
+    <state width="1340" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1589365225574" />
     <state width="1340" height="328" key="GridCell.Tab.1.bottom" timestamp="1589316317062">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -262,10 +269,10 @@
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
     <state x="780" y="229" key="VCS.ChangeListViewerDialog/0.0.1920.1050@0.0.1920.1050" timestamp="1584975610203" />
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1584975471156">
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2" timestamp="1589355270873">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1584975471156" />
+    <state x="552" y="258" key="Vcs.Push.Dialog.v2/0.0.1920.1050@0.0.1920.1050" timestamp="1589355270873" />
     <state width="700" height="500" key="XDebugger.FullValuePopup" timestamp="1585736083344">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
@@ -295,10 +302,10 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="527" y="137" key="refactoring.ChangeSignatureDialog/0.0.1366.738@0.0.1366.738" timestamp="1587203840666" />
-    <state x="616" y="245" key="run.anything.popup" timestamp="1585044169372">
+    <state x="616" y="245" key="run.anything.popup" timestamp="1589365171260">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>
-    <state x="616" y="245" key="run.anything.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1585044169372" />
+    <state x="616" y="245" key="run.anything.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1589365171260" />
     <state x="623" y="244" width="672" height="678" key="search.everywhere.popup" timestamp="1589307310413">
       <screen x="0" y="0" width="1920" height="1050" />
     </state>

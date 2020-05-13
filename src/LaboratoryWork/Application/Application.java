@@ -23,6 +23,8 @@ public class Application extends JFrame {
     private final TimerPanel timerPanel;
     private final ControlPanel controlPanel;
 
+    private boolean isPausedGoldenAI = false;
+    private boolean isPausedGuppiesAI = false;
     private boolean isVisible = true;
     private boolean isAllowModalInfo = true;
 
@@ -78,11 +80,15 @@ public class Application extends JFrame {
             habitat.begin_simulation();
             controlPanel.buttonPanel.start_button.setEnabled(false);
             menu.start_item.setEnabled(false);
-            controlPanel.buttonPanel.show_objects.setEnabled(true);
             controlPanel.buttonPanel.stop_button.setEnabled(true);
             menu.stop_item.setEnabled(true);
             controlPanel.buttonPanel.pause_button.setEnabled(true);
             menu.pause_item.setEnabled(true);
+
+            controlPanel.buttonPanel.show_objects.setEnabled(true);
+            controlPanel.buttonPanel.goldenAI_button.setEnabled(true);
+            controlPanel.buttonPanel.guppiesAI_button.setEnabled(true);
+
             runTimer();
         }
     }
@@ -95,6 +101,8 @@ public class Application extends JFrame {
 
     private void continue_() {
         habitat.continue_simulation();
+        update_status_goldenAI();
+        update_status_guppiesAI();
         controlPanel.buttonPanel.pause_button.setText("Пауза");
         menu.pause_item.setText("Пауза");
     }
@@ -112,13 +120,44 @@ public class Application extends JFrame {
             habitat.end_simulation();
             controlPanel.buttonPanel.start_button.setEnabled(true);
             menu.start_item.setEnabled(true);
-            controlPanel.buttonPanel.show_objects.setEnabled(false);
             controlPanel.buttonPanel.stop_button.setEnabled(false);
             menu.stop_item.setEnabled(false);
             controlPanel.buttonPanel.pause_button.setEnabled(false);
             menu.pause_item.setEnabled(false);
+
+            controlPanel.buttonPanel.show_objects.setEnabled(false);
+            controlPanel.buttonPanel.goldenAI_button.setEnabled(false);
+            controlPanel.buttonPanel.guppiesAI_button.setEnabled(false);
+
+            isPausedGoldenAI = false;
+            isPausedGuppiesAI = false;
+            controlPanel.buttonPanel.goldenAI_button.setText("Заморозить ИИ (З)");
+            controlPanel.buttonPanel.guppiesAI_button.setText("Заморозить ИИ (Г)");
+
             controlPanel.buttonPanel.pause_button.setText("Пауза");
             menu.pause_item.setText("Пауза");
+        }
+    }
+
+    private void update_status_goldenAI() {
+        if(isPausedGoldenAI) {
+            habitat.pause_goldenAI();
+            controlPanel.buttonPanel.goldenAI_button.setText("Разморозить ИИ (З)");
+        }
+        else {
+            habitat.resume_goldenAI();
+            controlPanel.buttonPanel.goldenAI_button.setText("Заморозить ИИ (З)");
+        }
+    }
+
+    private void update_status_guppiesAI() {
+        if(isPausedGuppiesAI) {
+            habitat.pause_guppiesAI();
+            controlPanel.buttonPanel.guppiesAI_button.setText("Разморозить ИИ (Г)");
+        }
+        else {
+            habitat.resume_guppiesAI();
+            controlPanel.buttonPanel.guppiesAI_button.setText("Заморозить ИИ (Г)");
         }
     }
 
@@ -141,13 +180,14 @@ public class Application extends JFrame {
         RadioButtonPanel radioButtonPanel;
         TextFieldPanel textFieldPanel;
         ProbablyPanel probablyPanel;
+        PriorityPanel priorityPanel;
 
         Color background = Color.PINK;
 
         public ControlPanel() {
             setLayout(new GridBagLayout());
             setBackground(background);
-            setPreferredSize(new Dimension(250, getHeight()));
+            setPreferredSize(new Dimension(280, getHeight()));
 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
@@ -159,6 +199,8 @@ public class Application extends JFrame {
             add(textFieldPanel = new TextFieldPanel(), gbc);
             gbc.gridy++;
             add(probablyPanel = new ProbablyPanel(), gbc);
+            gbc.gridy++;
+            add(priorityPanel = new PriorityPanel(), gbc);
             gbc.gridy++;
             add(radioButtonPanel = new RadioButtonPanel(), gbc);
             gbc.gridy++;
@@ -173,12 +215,14 @@ public class Application extends JFrame {
             private final JButton stop_button;
             private final JButton pause_button;
             private final JButton show_objects;
+            private final JButton goldenAI_button;
+            private final JButton guppiesAI_button;
 
             ButtonPanel() {
-                setLayout(new GridLayout(4,1));
+                setLayout(new GridLayout(3,2));
                 setBackground(background);
 
-                Dimension button_size = new Dimension(220,40);
+                Dimension button_size = new Dimension(135,30);
 
                 start_button = new JButton("Начать");
                 start_button.setPreferredSize(button_size);
@@ -248,10 +292,34 @@ public class Application extends JFrame {
                 });
                 pause_button.setToolTipText("Пауза");
 
+                goldenAI_button = new JButton("Заморозить ИИ (З)");
+                goldenAI_button.setPreferredSize(button_size);
+                goldenAI_button.setBackground(Color.lightGray);
+                goldenAI_button.setEnabled(false);
+                goldenAI_button.addActionListener(actionEvent -> {
+                    isPausedGoldenAI = !isPausedGoldenAI;
+                    update_status_goldenAI();
+                    requestFocus(false);
+                });
+                goldenAI_button.setToolTipText("ВКЛ/ВЫКЛ ИИ золотой рыбки");
+
+                guppiesAI_button = new JButton("Заморозить ИИ (Г)");
+                guppiesAI_button.setPreferredSize(button_size);
+                guppiesAI_button.setBackground(Color.lightGray);
+                guppiesAI_button.setEnabled(false);
+                guppiesAI_button.addActionListener(actionEvent -> {
+                    isPausedGuppiesAI = !isPausedGuppiesAI;
+                    update_status_guppiesAI();
+                    requestFocus(false);
+                });
+                guppiesAI_button.setToolTipText("ВКЛ/ВЫКЛ ИИ рыбки гуппи");
+
                 add(start_button);
+                add(stop_button);
                 add(show_objects);
                 add(pause_button);
-                add(stop_button);
+                add(goldenAI_button);
+                add(guppiesAI_button);
             }
         }
 
@@ -449,6 +517,95 @@ public class Application extends JFrame {
                 add(guppies_text_field_TTL, c);
                 c.gridx++;
                 add(new JLabel("сек."), c);
+            }
+        }
+
+        private class PriorityPanel extends JPanel {
+            private final JComboBox<String> goldenFishPriority;
+            private final JComboBox<String> guppiesFishPriority;
+
+            PriorityPanel() {
+                setLayout(new GridBagLayout());
+                setBackground(background);
+                setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.anchor = GridBagConstraints.CENTER;
+                c.insets = new Insets(2,2,2,2);
+
+                String[] items = {
+                    "Низкий",
+                    "Нормальный",
+                    "Высокий"
+                };
+
+                c.gridwidth = 4;
+                JLabel priorityTitle = new JLabel("Приоритет ИИ");
+                priorityTitle.setFont(new Font("Open Sans", Font.BOLD, 14));
+                add(priorityTitle, c);
+                c.gridy++;
+                c.gridwidth = 1;
+
+                add(new JLabel("Золотых"), c);
+                c.gridx++;
+                goldenFishPriority = new JComboBox<>(items);
+                if(habitat.getGoldenFishAIPriority() == 5) {
+                    goldenFishPriority.setSelectedItem("Нормальный");
+                }
+                else if(habitat.getGoldenFishAIPriority() == 1) {
+                    goldenFishPriority.setSelectedItem("Низкий");
+                }
+                else if(habitat.getGoldenFishAIPriority() == 10) {
+                    goldenFishPriority.setSelectedItem("Высокий");
+                }
+                goldenFishPriority.addActionListener(actionEvent -> {
+                    if(goldenFishPriority.getSelectedItem() == "Нормальный") {
+                        habitat.setGoldenFishAIPriority(5);
+                        requestFocus(false);
+                    }
+                    else if (goldenFishPriority.getSelectedItem() == "Низкий") {
+                        habitat.setGoldenFishAIPriority(1);
+                        requestFocus(false);
+                    }
+                    else if (goldenFishPriority.getSelectedItem() == "Высокий") {
+                        habitat.setGoldenFishAIPriority(10);
+                        requestFocus(false);
+                    }
+                });
+                add(goldenFishPriority, c);
+                c.gridx++;
+
+                add(new JLabel("Гуппи"), c);
+                c.gridx++;
+                guppiesFishPriority = new JComboBox<>(items);
+                if(habitat.getGuppiesFishAIPriority() == 5) {
+                    guppiesFishPriority.setSelectedItem("Нормальный");
+                }
+                else if(habitat.getGuppiesFishAIPriority() == 1) {
+                    guppiesFishPriority.setSelectedItem("Низкий");
+                }
+                else if(habitat.getGuppiesFishAIPriority() == 10) {
+                    guppiesFishPriority.setSelectedItem("Высокий");
+                }
+                guppiesFishPriority.addActionListener(actionEvent -> {
+                    if(guppiesFishPriority.getSelectedItem() == "Нормальный") {
+                        habitat.setGuppiesFishAIPriority(5);
+                        requestFocus(false);
+                    }
+                    else if (guppiesFishPriority.getSelectedItem() == "Низкий") {
+                        habitat.setGuppiesFishAIPriority(1);
+                        requestFocus(false);
+                    }
+                    else if (guppiesFishPriority.getSelectedItem() == "Высокий") {
+                        habitat.setGuppiesFishAIPriority(10);
+                        requestFocus(false);
+                    }
+                });
+                add(guppiesFishPriority, c);
             }
         }
 

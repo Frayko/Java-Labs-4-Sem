@@ -8,7 +8,7 @@ public abstract class Fish implements IBehaviour {
     private boolean reverse = false;
     private int imageWidth;
     private int imageHeight;
-    private double V = 4.0D;
+    private double V = 4.0;
 
     public Fish(int x, int y) {
         this.X = x;

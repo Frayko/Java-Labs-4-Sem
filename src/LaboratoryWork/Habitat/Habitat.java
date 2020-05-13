@@ -6,11 +6,8 @@ import java.util.TimerTask;
 import java.awt.*;
 
 import LaboratoryWork.Habitat.Fish.*;
-import LaboratoryWork.Habitat.Fish.FishAI.BaseAI;
 import LaboratoryWork.Habitat.Fish.FishAI.GoldenFishAI;
 import LaboratoryWork.Habitat.Fish.FishAI.GuppiesFishAI;
-import LaboratoryWork.Habitat.Fish.Objects.GoldenFish;
-import LaboratoryWork.Habitat.Fish.Objects.GuppiesFish;
 
 public class Habitat extends JComponent {
     private long LAST_SPAWN_TIME_GOLDEN;
@@ -38,6 +35,8 @@ public class Habitat extends JComponent {
         P2 = 50;
         goldenTTL = 1.0;
         guppiesTTL = 2.0;
+        goldenFishAI = new GoldenFishAI();
+        guppiesFishAI = new GuppiesFishAI();
     }
 
     public void update() {
@@ -102,9 +101,23 @@ public class Habitat extends JComponent {
 
     public void continue_simulation() {
         status = Status.ВКЛ;
-        goldenFishAI.resume_();
-        guppiesFishAI.resume_();
         startTimer();
+    }
+
+    public void pause_goldenAI() {
+        goldenFishAI.pause();
+    }
+
+    public void pause_guppiesAI() {
+        guppiesFishAI.pause();
+    }
+
+    public void resume_goldenAI() {
+        goldenFishAI.resume_();
+    }
+
+    public void resume_guppiesAI() {
+        guppiesFishAI.resume_();
     }
 
     public void startTimer() {
@@ -131,6 +144,8 @@ public class Habitat extends JComponent {
     public void setP2(int p2) { P2 = p2; }
     public void setGoldenTTL(double ttl) { goldenTTL = ttl; }
     public void setGuppiesTTL(double ttl) { guppiesTTL = ttl; }
+    public void setGoldenFishAIPriority(int priority) { goldenFishAI.setPriority(priority); }
+    public void setGuppiesFishAIPriority(int priority) { guppiesFishAI.setPriority(priority); }
     public double getN1() { return N1; }
     public double getN2() { return N2; }
     public int getP1() { return P1; }
@@ -139,6 +154,8 @@ public class Habitat extends JComponent {
     public long getPeriod() { return PERIOD; }
     public double getGoldenTTL() { return goldenTTL; }
     public double getGuppiesTTL() { return guppiesTTL; }
+    public int getGoldenFishAIPriority() { return goldenFishAI.getPriority(); }
+    public int getGuppiesFishAIPriority() { return guppiesFishAI.getPriority(); }
 
     public String getMetrics() {
         String str = "Прошло времени (сек): "; str += getTime();
