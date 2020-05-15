@@ -150,7 +150,7 @@ public class Habitat extends JComponent {
     public double getN2() { return N2; }
     public int getP1() { return P1; }
     public int getP2() { return P2; }
-    public double getTime() { return ticks / (PERIOD / 10.); }
+    public double getTime() { return (double) ticks / (PERIOD / 10.); }
     public long getPeriod() { return PERIOD; }
     public double getGoldenTTL() { return goldenTTL; }
     public double getGuppiesTTL() { return guppiesTTL; }

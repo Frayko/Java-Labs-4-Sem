@@ -1,9 +1,12 @@
 package LaboratoryWork.Application;
 
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyAdapter;
+import java.awt.event.*;
+import java.io.*;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,6 +21,7 @@ public class Application extends JFrame {
     Dimension screenSize = getToolkit().getScreenSize();
     private final int window_width;
     private final int window_height;
+    private final String configFile = "src/LaboratoryWork/Configs/config.txt";
 
     private final Menu menu;
     private final StatusPanel statusPanel;
@@ -58,20 +62,64 @@ public class Application extends JFrame {
         this.add(statusPanel, BorderLayout.NORTH);
         this.setJMenuBar(menu = new Menu());
 
-        addKeyListener(new KeyAdapter() {
+        try {
+            readConfig(configFile);
+        }
+        catch (FileNotFoundException fnf) {
+            try {
+                FileOutputStream fos = new FileOutputStream(configFile);
+                fos.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 switch (e.getKeyCode()) {
-                    case KeyEvent.VK_B -> start();
+                    case KeyEvent.VK_B -> {
+                        if(habitat.getStatus() == Status.ВЫКЛ)
+                            start();
+                    }
                     case KeyEvent.VK_E -> {
-                        if(isAllowModalInfo)
-                            new ModalInfoDialog();
-                        else
-                            stop();
+                        if(habitat.getStatus() != Status.ВЫКЛ) {
+                            if (isAllowModalInfo)
+                                new ModalInfoDialog();
+                            else
+                                stop();
+                        }
                     }
                     case KeyEvent.VK_T -> show_hide_timer();
-                    case KeyEvent.VK_P -> resume();
-                    case KeyEvent.VK_ESCAPE -> System.exit(0);
+                    case KeyEvent.VK_P -> {
+                        if(habitat.getStatus() != Status.ВЫКЛ)
+                            resume();
+                    }
+                    case KeyEvent.VK_ESCAPE -> {
+                        try {
+                            writeConfig(configFile);
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
+                        System.exit(0);
+                    }
+                }
+            }
+        });
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                try {
+                    writeConfig(configFile);
+                } catch (IOException ioException) {
+                    System.out.println("Ошибка записи конфигурационного файла!\n");
+                    ioException.printStackTrace();
                 }
             }
         });
@@ -88,7 +136,6 @@ public class Application extends JFrame {
             controlPanel.buttonPanel.pause_button.setEnabled(true);
             menu.pause_item.setEnabled(true);
 
-            controlPanel.buttonPanel.show_objects.setEnabled(true);
             controlPanel.buttonPanel.goldenAI_button.setEnabled(true);
             controlPanel.buttonPanel.guppiesAI_button.setEnabled(true);
 
@@ -128,7 +175,6 @@ public class Application extends JFrame {
             controlPanel.buttonPanel.pause_button.setEnabled(false);
             menu.pause_item.setEnabled(false);
 
-            controlPanel.buttonPanel.show_objects.setEnabled(false);
             controlPanel.buttonPanel.goldenAI_button.setEnabled(false);
             controlPanel.buttonPanel.guppiesAI_button.setEnabled(false);
 
@@ -233,7 +279,7 @@ public class Application extends JFrame {
                 start_button.setEnabled(true);
                 start_button.addActionListener(actionEvent -> {
                     start();
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 start_button.setToolTipText("Запуск симуляции");
 
@@ -246,16 +292,17 @@ public class Application extends JFrame {
                         new ModalInfoDialog();
                     else
                         stop();
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 stop_button.setToolTipText("Остановка симуляции");
 
                 show_objects = new JButton("Текущие объекты");
                 show_objects.setPreferredSize(button_size);
                 show_objects.setBackground(Color.lightGray);
-                show_objects.setEnabled(false);
+                show_objects.setEnabled(true);
                 show_objects.addActionListener(actionEvent -> {
-                    pause();
+                    if(habitat.getStatus() == Status.ВКЛ)
+                        pause();
 
                     StringBuilder buf = new StringBuilder();
 
@@ -282,7 +329,9 @@ public class Application extends JFrame {
                             options[0]
                     );
                     resume();
+                    Application.this.requestFocus(true);
                 });
+                show_objects.requestFocus(false);
                 show_objects.setToolTipText("Показать все объекты");
 
                 pause_button = new JButton("Пауза");
@@ -291,7 +340,7 @@ public class Application extends JFrame {
                 pause_button.setEnabled(false);
                 pause_button.addActionListener(actionEvent -> {
                     resume();
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 pause_button.setToolTipText("Пауза");
 
@@ -302,7 +351,7 @@ public class Application extends JFrame {
                 goldenAI_button.addActionListener(actionEvent -> {
                     isPausedGoldenAI = !isPausedGoldenAI;
                     update_status_goldenAI();
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 goldenAI_button.setToolTipText("ВКЛ/ВЫКЛ ИИ золотой рыбки");
 
@@ -313,7 +362,7 @@ public class Application extends JFrame {
                 guppiesAI_button.addActionListener(actionEvent -> {
                     isPausedGuppiesAI = !isPausedGuppiesAI;
                     update_status_guppiesAI();
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 guppiesAI_button.setToolTipText("ВКЛ/ВЫКЛ ИИ рыбки гуппи");
 
@@ -327,16 +376,18 @@ public class Application extends JFrame {
         }
 
         private class CheckBoxPanel extends JPanel {
+            JCheckBox modal_info_checkbox;
+
             CheckBoxPanel() {
                 setLayout(new GridLayout(1,1));
                 setBackground(background);
 
-                JCheckBox modal_info_checkbox = new JCheckBox("Показывать информацию после остановки");
+                modal_info_checkbox = new JCheckBox("Показывать информацию после остановки");
                 modal_info_checkbox.setSelected(true);
                 modal_info_checkbox.setBackground(background);
                 modal_info_checkbox.addActionListener(actionEvent -> {
                     isAllowModalInfo = !isAllowModalInfo;
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 add(modal_info_checkbox);
                 modal_info_checkbox.setToolTipText("Включить/Выключить отображение информации");
@@ -356,7 +407,7 @@ public class Application extends JFrame {
                 show_timer_button.addActionListener(actionEvent -> {
                     isVisible = true;
                     timerPanel.setVisible(true);
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 add(show_timer_button);
 
@@ -365,7 +416,7 @@ public class Application extends JFrame {
                 hide_timer_button.addActionListener(actionEvent -> {
                     isVisible = false;
                     timerPanel.setVisible(false);
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 add(hide_timer_button);
 
@@ -412,7 +463,7 @@ public class Application extends JFrame {
                 golden_text_field_N.addActionListener(actionEvent -> {
                     try {
                         habitat.setN1(Double.parseDouble(golden_text_field_N.getText()));
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                         if(habitat.getN1() < 0) {
                             throw new Exception();
                         }
@@ -440,7 +491,7 @@ public class Application extends JFrame {
                 guppies_text_field_N.addActionListener(actionEvent -> {
                     try {
                         habitat.setN2(Double.parseDouble(guppies_text_field_N.getText()));
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                         if(habitat.getN2() < 0) {
                             throw new Exception();
                         }
@@ -476,7 +527,7 @@ public class Application extends JFrame {
                 golden_text_field_TTL.addActionListener(actionEvent -> {
                     try {
                         habitat.setGoldenTTL(Double.parseDouble(golden_text_field_TTL.getText()));
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                         if(habitat.getGoldenTTL() < 0) {
                             throw new Exception();
                         }
@@ -504,7 +555,7 @@ public class Application extends JFrame {
                 guppies_text_field_TTL.addActionListener(actionEvent -> {
                     try {
                         habitat.setGuppiesTTL(Double.parseDouble(guppies_text_field_TTL.getText()));
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                         if(habitat.getGuppiesTTL() < 0) {
                             throw new Exception();
                         }
@@ -568,15 +619,15 @@ public class Application extends JFrame {
                 goldenFishPriority.addActionListener(actionEvent -> {
                     if(goldenFishPriority.getSelectedItem() == "Нормальный") {
                         habitat.setGoldenFishAIPriority(5);
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                     }
                     else if (goldenFishPriority.getSelectedItem() == "Низкий") {
                         habitat.setGoldenFishAIPriority(1);
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                     }
                     else if (goldenFishPriority.getSelectedItem() == "Высокий") {
                         habitat.setGoldenFishAIPriority(10);
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                     }
                 });
                 add(goldenFishPriority, c);
@@ -597,15 +648,15 @@ public class Application extends JFrame {
                 guppiesFishPriority.addActionListener(actionEvent -> {
                     if(guppiesFishPriority.getSelectedItem() == "Нормальный") {
                         habitat.setGuppiesFishAIPriority(5);
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                     }
                     else if (guppiesFishPriority.getSelectedItem() == "Низкий") {
                         habitat.setGuppiesFishAIPriority(1);
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                     }
                     else if (guppiesFishPriority.getSelectedItem() == "Высокий") {
                         habitat.setGuppiesFishAIPriority(10);
-                        requestFocus(false);
+                        Application.this.requestFocus(true);
                     }
                 });
                 add(guppiesFishPriority, c);
@@ -651,7 +702,7 @@ public class Application extends JFrame {
                 golden_combo_box.setSelectedItem(Integer.toString(habitat.getP1()));
                 golden_combo_box.addActionListener(actionEvent -> {
                     habitat.setP1(Integer.parseInt(items[golden_combo_box.getSelectedIndex()]));
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 add(golden_combo_box);
             }
@@ -689,7 +740,7 @@ public class Application extends JFrame {
                 guppies_slider.setPaintTicks(true);
                 guppies_slider.addChangeListener(actionEvent -> {
                     habitat.setP2(guppies_slider.getValue());
-                    requestFocus(false);
+                    Application.this.requestFocus(true);
                 });
                 add(guppies_slider);
             }
@@ -776,10 +827,133 @@ public class Application extends JFrame {
         }
     }
 
+    private class ConsoleDialog extends JDialog {
+        JTextArea info_area;
+        JTextField input_area;
+        int dialog_window_width = 500;
+        int dialog_window_height = 300;
+
+        private ConsoleDialog () {
+            this.setTitle("Консоль");
+            this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/console_icon.png").getImage());
+            this.setBackground(Color.white);
+            this.setForeground(Color.DARK_GRAY);
+            this.setBounds(screenSize.width/2 - dialog_window_width/2,
+                    screenSize.height/2 - dialog_window_height/2,
+                    dialog_window_width, dialog_window_height);
+            this.setLayout(new BorderLayout());
+            this.setModal(false);
+            this.setAlwaysOnTop(true);
+            this.setResizable(false);
+            this.setFocusable(true);
+
+            PipedInputStream pis = new PipedInputStream();
+            PipedOutputStream pos = new PipedOutputStream();
+
+            try {
+                pis.connect(pos);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            info_area = new JTextArea("Для того, чтобы узнать все доступные команды напишите: help\n");
+            info_area.setFont(new Font("Open Sans", Font.ITALIC, 12));
+            info_area.setEditable(false);
+            this.add(info_area, BorderLayout.CENTER);
+
+            input_area = new JTextField();
+            input_area.setPreferredSize(new Dimension(dialog_window_width, 25));
+            input_area.setRequestFocusEnabled(true);
+            input_area.addActionListener(actionEvent -> {
+                String command = input_area.getText();
+                info_area.append(command + "\n");
+                if (command.startsWith("help")) {
+                    info_area.append("Доступные команды:\n" +
+                            "clear - очистить экран\n" +
+                            "close - закрыть консоль\n" +
+                            "setP1 [от 0 до 100] - Установить вероятность рождения золотой рыбки\n" +
+                            "getP1 - Узнать вероятность рождения золотой рыбки\n");
+                }
+                else if (command.startsWith("clear")) {
+                    info_area.setText("");
+                }
+                else if (command.startsWith("setP1 ")) {
+                    int P1 = Integer.parseInt(command.substring(command.indexOf(" ") + 1));
+                    if(P1 > 100)
+                        P1 = 100;
+                    else if (P1 < 0)
+                        P1 = 0;
+                    try {
+                        pos.write((byte) P1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    info_area.append("Успешно изменено!\n");
+                }
+                else if (command.startsWith("getP1")) {
+                    info_area.append("Вероятность рождения золотой рыбки: " + habitat.getP1() + "%\n");
+                }
+                else if (command.startsWith("close")) {
+                    try {
+                        pis.close();
+                        pos.close();
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    this.dispose();
+                }
+                else {
+                    info_area.append("Неизвестная команда. Узнать все доступные команды: help\n");
+                }
+                input_area.setText("");
+            });
+            this.add(input_area, BorderLayout.SOUTH);
+
+            Thread consoleIO = new Thread(() -> {
+                while(true) {
+                    try {
+                        byte in[] = new byte[1];
+                        if(pis.available() > 0) {
+                            pis.read(in);
+                            int buf = in[0];
+                            habitat.setP1(buf);
+                            controlPanel.probablyPanel.comboBoxPanel.golden_combo_box.setSelectedItem(Integer.toString(buf));
+                            Thread.sleep(10);
+                        }
+                    } catch (IOException | InterruptedException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
+            });
+
+            this.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    super.windowClosing(e);
+                    try {
+                        pis.close();
+                        pos.close();
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
+                }
+            });
+
+            consoleIO.setName("Console I/O daemon");
+            consoleIO.setDaemon(true);
+            consoleIO.start();
+            this.add(new JScrollPane(info_area), BorderLayout.CENTER);
+            this.setVisible(true);
+        }
+    }
+
     private class Menu extends JMenuBar {
         JMenuItem start_item;
         JMenuItem stop_item;
         JMenuItem pause_item;
+        JMenuItem save_item;
+        JMenuItem load_item;
 
         public Menu() {
             JMenu main_menu = new JMenu("Главное меню");
@@ -807,12 +981,59 @@ public class Application extends JFrame {
             pause_item.setToolTipText("Пауза");
             main_menu.add(pause_item);
 
+            save_item = new JMenuItem("Сохранить");
+            save_item.setEnabled(true);
+            save_item.addActionListener(actionEvent -> {
+                if(habitat.getStatus() == Status.ВКЛ)
+                    pause();
+
+                JFileChooser fc = new JFileChooser();
+                fc.showSaveDialog(null);
+                File file = fc.getSelectedFile();
+                saveObjects(file);
+            });
+            save_item.setToolTipText("Сохранить всех рыбок");
+            main_menu.add(save_item);
+
+            load_item = new JMenuItem("Загрузить");
+            load_item.setEnabled(true);
+            load_item.addActionListener(actionEvent -> {
+                if(habitat.getStatus() == Status.ВКЛ)
+                    pause();
+
+                JFileChooser fc = new JFileChooser();
+                fc.showOpenDialog(null);
+                File file = fc.getSelectedFile();
+                loadObjects(file);
+            });
+            load_item.setToolTipText("Загрузить всех рыбок");
+            main_menu.add(load_item);
+
             JMenuItem exit_item = new JMenuItem("Выход");
-            exit_item.addActionListener(actionEvent -> System.exit(0));
+            exit_item.addActionListener(actionEvent -> {
+                try {
+                    writeConfig(configFile);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+                System.exit(0);
+            });
             exit_item.setToolTipText("Закрыть программу");
             main_menu.add(exit_item);
 
+
+            JMenu console_menu = new JMenu("Консоль");
+            console_menu.addMenuListener(new MenuListener() {
+                @Override
+                public void menuSelected(MenuEvent e) { new ConsoleDialog(); }
+                @Override
+                public void menuDeselected(MenuEvent e) {}
+                @Override
+                public void menuCanceled(MenuEvent e) {}
+            });
+
             this.add(main_menu);
+            this.add(console_menu);
         }
     }
 
@@ -849,6 +1070,118 @@ public class Application extends JFrame {
             this.setToolTipText("Текущий статус симуляции");
             this.add(text);
             this.setVisible(true);
+        }
+    }
+
+    private void writeConfig(String fileName) throws IOException {
+        FileOutputStream fos = new FileOutputStream(new File(fileName));
+        String config = controlPanel.textFieldPanel.golden_text_field_N.getText() + "\n";
+        config += controlPanel.textFieldPanel.guppies_text_field_N.getText() + "\n";
+        config += controlPanel.textFieldPanel.golden_text_field_TTL.getText() + "\n";
+        config += controlPanel.textFieldPanel.guppies_text_field_TTL.getText() + "\n";
+        config += controlPanel.probablyPanel.comboBoxPanel.golden_combo_box.getSelectedItem() + "\n";
+        config += controlPanel.probablyPanel.sliderPanel.guppies_slider.getValue() + "\n";
+        config += controlPanel.priorityPanel.goldenFishPriority.getSelectedIndex() + "\n";
+        config += controlPanel.priorityPanel.guppiesFishPriority.getSelectedIndex() + "\n";
+        config += isVisible ? "1\n" : "0\n";
+        config += controlPanel.checkBoxPanel.modal_info_checkbox.isSelected() ? "1\n" : "0\n";
+        fos.write(config.getBytes());
+        fos.close();
+    }
+
+    private void readConfig(String fileName) throws IOException {
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(fileName));
+        int buf;
+        int cur_line = 0;
+        String line = "";
+        while ((buf = bis.read()) != -1) {
+            if(!String.valueOf((char)buf).equals("\n"))
+                line += String.valueOf((char)buf);
+            else {
+                switch (cur_line) {
+                    case 0 -> {
+                        habitat.setN1(Double.parseDouble(line));
+                        controlPanel.textFieldPanel.golden_text_field_N.setText(line);
+                    }
+                    case 1 -> {
+                        habitat.setN2(Double.parseDouble(line));
+                        controlPanel.textFieldPanel.guppies_text_field_N.setText(line);
+                    }
+                    case 2 -> {
+                        habitat.setGoldenTTL(Double.parseDouble(line));
+                        controlPanel.textFieldPanel.golden_text_field_TTL.setText(line);
+                    }
+                    case 3 -> {
+                        habitat.setGuppiesTTL(Double.parseDouble(line));
+                        controlPanel.textFieldPanel.guppies_text_field_TTL.setText(line);
+                    }
+                    case 4 -> {
+                       habitat.setP1(Integer.parseInt(line));
+                       controlPanel.probablyPanel.comboBoxPanel.golden_combo_box.setSelectedItem(line);
+                    }
+                    case 5 -> {
+                        habitat.setP2(Integer.parseInt(line));
+                        controlPanel.probablyPanel.sliderPanel.guppies_slider.setValue(Integer.parseInt(line));
+                    }
+                    case 6 -> {
+                        habitat.setGoldenFishAIPriority(Integer.parseInt(line) == 0 ? 1 : 5 * Integer.parseInt(line));
+                        controlPanel.priorityPanel.goldenFishPriority.setSelectedIndex(Integer.parseInt(line));
+                    }
+                    case 7 -> {
+                        habitat.setGuppiesFishAIPriority(Integer.parseInt(line) == 0 ? 1 : 5 * Integer.parseInt(line));
+                        controlPanel.priorityPanel.guppiesFishPriority.setSelectedIndex(Integer.parseInt(line));
+                    }
+                    case 8 -> {
+                        if(Integer.parseInt(line) == 1) {
+                            isVisible = true;
+                            timerPanel.setVisible(true);
+                            controlPanel.radioButtonPanel.show_timer_button.setSelected(true);
+                        }
+                        else {
+                            isVisible = false;
+                            timerPanel.setVisible(false);
+                            controlPanel.radioButtonPanel.hide_timer_button.setSelected(true);
+                        }
+                    }
+                    case 9 -> {
+                        if(Integer.parseInt(line) == 1) {
+                            isAllowModalInfo = true;
+                            controlPanel.checkBoxPanel.modal_info_checkbox.setSelected(true);
+                        }
+                        else {
+                            isAllowModalInfo = false;
+                            controlPanel.checkBoxPanel.modal_info_checkbox.setSelected(false);
+                        }
+                    }
+                }
+                cur_line++;
+                line = "";
+            }
+        }
+    }
+
+    private void saveObjects(File file) {
+        ObjectOutputStream oos;
+        try {
+            oos = new ObjectOutputStream(new FileOutputStream(file, false));
+            oos.writeObject(FishArray.getFishArray().getList());
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadObjects(File file) {
+        ObjectInputStream ois;
+        try {
+            ois = new ObjectInputStream(new FileInputStream(file));
+            FishArray.getFishArray().removeAllFishes();
+            FishArray.getFishArray().setFishes((LinkedList<Fish>) ois.readObject(), habitat.getTime() * 10.);
+            habitat.repaint();
+            ois.close();
+        }
+        catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

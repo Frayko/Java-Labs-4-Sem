@@ -1,8 +1,9 @@
 package LaboratoryWork.Habitat.Fish;
 
 import java.awt.Graphics;
+import java.io.Serializable;
 
-public abstract class Fish implements IBehaviour {
+public abstract class Fish implements IBehaviour, Serializable {
     private int X;
     private int Y;
     private boolean reverse = false;

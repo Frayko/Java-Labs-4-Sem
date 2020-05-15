@@ -5,9 +5,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import javax.imageio.ImageIO;
 
-public class GoldenFish extends Fish {
+public class GoldenFish extends Fish implements Serializable {
     private static BufferedImage image;
 
     public GoldenFish(int x, int y) {

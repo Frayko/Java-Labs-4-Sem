@@ -30,6 +30,14 @@ public class FishArray {
         map.put(id, bornTime);
     }
 
+    public synchronized void setFishes(LinkedList<Fish> fishes, double bornTime) {
+        for(Fish fish : fishes) {
+            if(fish.getReverse() && fish instanceof GoldenFish && bornTime == 0.0)
+               fish.reverseImageWidth();
+            addFish(fish, bornTime);
+        }
+    }
+
     public synchronized void moveGoldenFishes(int dX, int dY, int windowWidth) {
         for(Fish fish : list) {
             if (fish instanceof GoldenFish) {
