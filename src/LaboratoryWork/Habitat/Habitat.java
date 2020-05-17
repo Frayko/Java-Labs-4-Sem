@@ -87,7 +87,6 @@ public class Habitat extends JComponent {
         guppiesFishAI.interrupt();
         timer.cancel();
         ticks = 0;
-        fishCreator.resetFishes();
         FishArray.getFishArray().removeAllFishes();
         repaint();
     }
@@ -160,9 +159,9 @@ public class Habitat extends JComponent {
     public String getMetrics() {
         String str = "Прошло времени (сек): "; str += getTime();
         str += "\nВсего было рыбок: ";
-        str += fishCreator.getAllFishCount();
-        str += "\nЗолотых: "; str += fishCreator.getFishCount(FishTypes.GoldenFish);
-        str += "\nГуппи: "; str += fishCreator.getFishCount(FishTypes.GuppiesFish);
+        str += FishArray.getFishArray().getAllFishCount();
+        str += "\nЗолотых: "; str += FishArray.getFishArray().getFishCount(FishTypes.GoldenFish);
+        str += "\nГуппи: "; str += FishArray.getFishArray().getFishCount(FishTypes.GuppiesFish);
         str += "\n----------------------------------------------";
         return str;
     }

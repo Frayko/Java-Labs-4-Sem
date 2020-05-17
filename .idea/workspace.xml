@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Assets/console_icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Configs/config.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/LaboratoryWork/Configs/objects.txt" afterDir="false" />
+    <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="Fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Fish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Fish.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Configs/config.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishArray.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishArray.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GoldenFish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GoldenFish.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GuppiesFish.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/Objects/GuppiesFish.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishCreator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishCreator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -296,25 +291,25 @@
       <screen x="0" y="0" width="1366" height="738" />
     </state>
     <state x="517" y="286" width="356" height="166" key="Github.CreateGistDialog/0.0.1366.738@0.0.1366.738" timestamp="1582624206358" />
-    <state width="1284" height="105" key="GridCell.Tab.0.bottom" timestamp="1589574062081">
+    <state width="1284" height="105" key="GridCell.Tab.0.bottom" timestamp="1589737501788">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1284" height="105" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1589574062081" />
+    <state width="1284" height="105" key="GridCell.Tab.0.bottom/0.0.1366.738@0.0.1366.738" timestamp="1589737501788" />
     <state width="1340" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1050@0.0.1920.1050" timestamp="1587029885367" />
-    <state width="1284" height="105" key="GridCell.Tab.0.center" timestamp="1589574062081">
+    <state width="1284" height="105" key="GridCell.Tab.0.center" timestamp="1589737501788">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1284" height="105" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1589574062081" />
+    <state width="1284" height="105" key="GridCell.Tab.0.center/0.0.1366.738@0.0.1366.738" timestamp="1589737501788" />
     <state width="1340" height="266" key="GridCell.Tab.0.center/0.0.1920.1050@0.0.1920.1050" timestamp="1587029885367" />
-    <state width="1284" height="105" key="GridCell.Tab.0.left" timestamp="1589574062081">
+    <state width="1284" height="105" key="GridCell.Tab.0.left" timestamp="1589737501787">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1284" height="105" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1589574062081" />
+    <state width="1284" height="105" key="GridCell.Tab.0.left/0.0.1366.738@0.0.1366.738" timestamp="1589737501787" />
     <state width="1340" height="266" key="GridCell.Tab.0.left/0.0.1920.1050@0.0.1920.1050" timestamp="1587029885366" />
-    <state width="1284" height="105" key="GridCell.Tab.0.right" timestamp="1589574062081">
+    <state width="1284" height="105" key="GridCell.Tab.0.right" timestamp="1589737501788">
       <screen x="0" y="0" width="1366" height="738" />
     </state>
-    <state width="1284" height="105" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1589574062081" />
+    <state width="1284" height="105" key="GridCell.Tab.0.right/0.0.1366.738@0.0.1366.738" timestamp="1589737501788" />
     <state width="1340" height="266" key="GridCell.Tab.0.right/0.0.1920.1050@0.0.1920.1050" timestamp="1587029885367" />
     <state width="1284" height="207" key="GridCell.Tab.1.bottom" timestamp="1589572018610">
       <screen x="0" y="0" width="1366" height="738" />
