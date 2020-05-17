@@ -1,8 +1,7 @@
 package LaboratoryWork.Application;
 
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -10,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.net.Socket;
 
 import LaboratoryWork.Habitat.Fish.Fish;
 import LaboratoryWork.Habitat.Fish.FishArray;
@@ -21,17 +21,25 @@ public class Application extends JFrame {
     Dimension screenSize = getToolkit().getScreenSize();
     private final int window_width;
     private final int window_height;
-    private final String configFile = "src/LaboratoryWork/Configs/config.txt";
+    private String userName;
+    private final String configFile;
+    private final String directory;
+
+    private Socket socket;
+    private final String host = "localhost";
+    private final int port = 2000;
+    private DataInputStream inStream;
+    private DataOutputStream outStream;
+    private static final LinkedList<String> usersList = new LinkedList<>();
 
     private final Menu menu;
-    private final StatusPanel statusPanel;
-    private final TimerPanel timerPanel;
     private final ControlPanel controlPanel;
 
     private boolean isPausedGoldenAI = false;
     private boolean isPausedGuppiesAI = false;
     private boolean isVisible = true;
     private boolean isAllowModalInfo = true;
+    private boolean isConnected = false;
 
     private final Habitat habitat;
 
@@ -40,7 +48,8 @@ public class Application extends JFrame {
         this.window_width = width;
         this.window_height = height;
 
-        this.setTitle("Генератор рыбок");
+        new userDialog();
+        this.setTitle("Генератор рыбок (Текущий пользователь: " + userName + ")");
         this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/window_icon.png").getImage());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
@@ -53,20 +62,20 @@ public class Application extends JFrame {
         this.setResizable(false);
 
         controlPanel = new ControlPanel();
-        statusPanel = new StatusPanel();
-        timerPanel = new TimerPanel();
 
         this.add(habitat, BorderLayout.CENTER);
         this.add(controlPanel, BorderLayout.EAST);
-        this.add(timerPanel, BorderLayout.SOUTH);
-        this.add(statusPanel, BorderLayout.NORTH);
         this.setJMenuBar(menu = new Menu());
+
+        directory = "src/LaboratoryWork/Configs/" + userName;
+        configFile = directory + "/config.txt";
 
         try {
             readConfig(configFile);
         }
         catch (FileNotFoundException fnf) {
             try {
+                new File(directory).mkdir();
                 FileOutputStream fos = new FileOutputStream(configFile);
                 fos.close();
             }
@@ -210,9 +219,33 @@ public class Application extends JFrame {
         }
     }
 
+    private void connect() {
+        try {
+            isConnected = true;
+            socket = new Socket(host, port);
+            inStream = new DataInputStream(socket.getInputStream());
+            outStream = new DataOutputStream(socket.getOutputStream());
+        }
+        catch (IOException e) {
+            new ErrorDialog("Попытка подключения к серверу не удалась!\nПроверьте работу сервера...");
+            isConnected = false;
+        }
+    }
+
+    private void disconnect() {
+        try {
+            isConnected = false;
+            inStream.close();
+            outStream.close();
+        } catch (IOException e) {
+            new ErrorDialog("Попытка отключения от сервера не удалась!");
+            isConnected = true;
+        }
+    }
+
     private void show_hide_timer() {
         isVisible = !isVisible;
-        timerPanel.setVisible(isVisible);
+        controlPanel.timerPanel.setVisible(isVisible);
         if(isVisible) {
             controlPanel.radioButtonPanel.show_timer_button.setSelected(true);
             controlPanel.radioButtonPanel.hide_timer_button.setSelected(false);
@@ -224,12 +257,15 @@ public class Application extends JFrame {
     }
 
     private class ControlPanel extends JPanel {
+        TimerPanel timerPanel;
         ButtonPanel buttonPanel;
         CheckBoxPanel checkBoxPanel;
         RadioButtonPanel radioButtonPanel;
-        TextFieldPanel textFieldPanel;
+        PeriodPanel periodPanel;
+        LivePanel livePanel;
         ProbablyPanel probablyPanel;
         PriorityPanel priorityPanel;
+        NetworkPanel networkPanel;
 
         Color background = Color.PINK;
 
@@ -243,18 +279,25 @@ public class Application extends JFrame {
             gbc.gridy = 0;
             gbc.weightx = 1;
             gbc.weighty = 1;
+            gbc.insets = new Insets(-7,0,0,0);
+
+            add(timerPanel = new TimerPanel(), gbc);
+            gbc.gridy++;
             gbc.insets = new Insets(2,2,2,2);
 
-            add(textFieldPanel = new TextFieldPanel(), gbc);
+            add(periodPanel = new PeriodPanel(), gbc);
+            gbc.gridy++;
+            add(livePanel = new LivePanel(), gbc);
             gbc.gridy++;
             add(probablyPanel = new ProbablyPanel(), gbc);
             gbc.gridy++;
             add(priorityPanel = new PriorityPanel(), gbc);
             gbc.gridy++;
+            add(networkPanel = new NetworkPanel(), gbc);
+            gbc.gridy++;
             add(radioButtonPanel = new RadioButtonPanel(), gbc);
             gbc.gridy++;
             add(checkBoxPanel = new CheckBoxPanel(), gbc);
-            gbc.gridy++;
             gbc.gridy++;
             add(buttonPanel = new ButtonPanel(), gbc);
         }
@@ -427,16 +470,19 @@ public class Application extends JFrame {
             }
         }
 
-        private class TextFieldPanel extends JPanel {
+        private class PeriodPanel extends JPanel {
             private final JTextField golden_text_field_N;
-            private final JTextField golden_text_field_TTL;
             private final JTextField guppies_text_field_N;
-            private final JTextField guppies_text_field_TTL;
 
-            public TextFieldPanel() {
+            public PeriodPanel() {
                 setLayout(new GridBagLayout());
                 setBackground(background);
-                setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+                setPreferredSize(new Dimension(270, 50));
+
+                TitledBorder border = new TitledBorder("Период рождения");
+                border.setTitleFont(new Font("Open Sans", Font.BOLD, 14));
+                border.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+                setBorder(border);
 
                 GridBagConstraints c = new GridBagConstraints();
                 c.gridx = 0;
@@ -446,17 +492,9 @@ public class Application extends JFrame {
                 c.anchor = GridBagConstraints.CENTER;
                 c.insets = new Insets(2,2,2,2);
 
-                //Период рождения
-                c.gridwidth = 7;
-                JLabel periodTime = new JLabel("Период между рождениями");
-                periodTime.setFont(new Font("Open Sans", Font.BOLD, 14));
-                add(periodTime, c);
-
-                c.gridy++;
-                c.gridwidth = 1;
-
                 add(new JLabel("Золотых:"), c);
                 c.gridx++;
+                c.ipadx = 30;
                 golden_text_field_N = new JTextField(Double.toString(habitat.getN1()));
                 golden_text_field_N.setHorizontalAlignment(JTextField.RIGHT);
                 golden_text_field_N.setPreferredSize(new Dimension(30, 20));
@@ -478,13 +516,15 @@ public class Application extends JFrame {
                 });
                 add(golden_text_field_N, c);
                 c.gridx++;
+                c.ipadx = 0;
                 add(new JLabel("/сек"), c);
                 c.gridx++;
-                add(new JLabel(" | "), c);
+                add(new JLabel("   "), c);
                 c.gridx++;
 
                 add(new JLabel("Гуппи:"), c);
                 c.gridx++;
+                c.ipadx = 30;
                 guppies_text_field_N = new JTextField(Double.toString(habitat.getN2()));
                 guppies_text_field_N.setHorizontalAlignment(JTextField.RIGHT);
                 guppies_text_field_N.setPreferredSize(new Dimension(30, 20));
@@ -506,21 +546,36 @@ public class Application extends JFrame {
                 });
                 add(guppies_text_field_N, c);
                 c.gridx++;
+                c.ipadx = 0;
                 add(new JLabel("/сек"), c);
-                c.gridy++;
+            }
+        }
 
-                //Время жизни
+        private class LivePanel extends JPanel {
+            private final JTextField golden_text_field_TTL;
+            private final JTextField guppies_text_field_TTL;
+
+            public LivePanel() {
+                setLayout(new GridBagLayout());
+                setBackground(background);
+                setPreferredSize(new Dimension(270, 50));
+
+                TitledBorder border = new TitledBorder("Время жизни");
+                border.setTitleFont(new Font("Open Sans", Font.BOLD, 14));
+                border.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+                setBorder(border);
+
+                GridBagConstraints c = new GridBagConstraints();
                 c.gridx = 0;
-                c.gridwidth = 7;
-                JLabel liveTime = new JLabel("Время жизни");
-                liveTime.setFont(new Font("Open Sans", Font.BOLD, 14));
-                add(liveTime, c);
-
-                c.gridy++;
-                c.gridwidth = 1;
+                c.gridy = 0;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.anchor = GridBagConstraints.CENTER;
+                c.insets = new Insets(2,2,2,2);
 
                 add(new JLabel("Золотых:"), c);
                 c.gridx++;
+                c.ipadx = 30;
                 golden_text_field_TTL = new JTextField(Double.toString(habitat.getGoldenTTL()));
                 golden_text_field_TTL.setHorizontalAlignment(JTextField.RIGHT);
                 golden_text_field_TTL.setPreferredSize(new Dimension(30, 20));
@@ -542,13 +597,15 @@ public class Application extends JFrame {
                 });
                 add(golden_text_field_TTL, c);
                 c.gridx++;
+                c.ipadx = 0;
                 add(new JLabel("сек."), c);
                 c.gridx++;
-                add(new JLabel(" | "), c);
+                add(new JLabel("   "), c);
                 c.gridx++;
 
                 add(new JLabel("Гуппи:"), c);
                 c.gridx++;
+                c.ipadx = 30;
                 guppies_text_field_TTL = new JTextField(Double.toString(habitat.getGuppiesTTL()));
                 guppies_text_field_TTL.setHorizontalAlignment(JTextField.RIGHT);
                 guppies_text_field_TTL.setPreferredSize(new Dimension(30, 20));
@@ -570,6 +627,7 @@ public class Application extends JFrame {
                 });
                 add(guppies_text_field_TTL, c);
                 c.gridx++;
+                c.ipadx = 0;
                 add(new JLabel("сек."), c);
             }
         }
@@ -581,13 +639,16 @@ public class Application extends JFrame {
             PriorityPanel() {
                 setLayout(new GridBagLayout());
                 setBackground(background);
-                setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+                setPreferredSize(new Dimension(270, 80));
+
+                TitledBorder border = new TitledBorder("Приоритет ИИ");
+                border.setTitleFont(new Font("Open Sans", Font.BOLD, 14));
+                border.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+                setBorder(border);
 
                 GridBagConstraints c = new GridBagConstraints();
                 c.gridx = 0;
                 c.gridy = 0;
-                c.weightx = 1;
-                c.weighty = 1;
                 c.anchor = GridBagConstraints.CENTER;
                 c.insets = new Insets(2,2,2,2);
 
@@ -596,13 +657,6 @@ public class Application extends JFrame {
                     "Нормальный",
                     "Высокий"
                 };
-
-                c.gridwidth = 4;
-                JLabel priorityTitle = new JLabel("Приоритет ИИ");
-                priorityTitle.setFont(new Font("Open Sans", Font.BOLD, 14));
-                add(priorityTitle, c);
-                c.gridy++;
-                c.gridwidth = 1;
 
                 add(new JLabel("Золотых"), c);
                 c.gridx++;
@@ -631,7 +685,8 @@ public class Application extends JFrame {
                     }
                 });
                 add(goldenFishPriority, c);
-                c.gridx++;
+                c.gridy++;
+                c.gridx = 0;
 
                 add(new JLabel("Гуппи"), c);
                 c.gridx++;
@@ -670,22 +725,22 @@ public class Application extends JFrame {
             ProbablyPanel() {
                 setLayout(new GridBagLayout());
                 setBackground(background);
-                setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+                setPreferredSize(new Dimension(270, 110));
+
+                TitledBorder border = new TitledBorder("Вероятнось рождения");
+                border.setTitleFont(new Font("Open Sans", Font.BOLD, 14));
+                border.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+                setBorder(border);
 
                 GridBagConstraints c = new GridBagConstraints();
                 c.gridx = 0;
                 c.gridy = 0;
-                c.weightx = 1;
-                c.weighty = 1;
                 c.anchor = GridBagConstraints.CENTER;
                 c.insets = new Insets(2,2,2,2);
 
-                JLabel probablyBorn = new JLabel("Вероятность рождения [%]");
-                probablyBorn.setFont(new Font("Open Sans", Font.BOLD, 14));
-                add(probablyBorn, c);
-                c.gridy++;
                 add(comboBoxPanel = new ComboBoxPanel(), c);
                 c.gridy++;
+                c.ipadx = 150;
                 add(sliderPanel = new SliderPanel(), c);
             }
         }
@@ -743,6 +798,83 @@ public class Application extends JFrame {
                     Application.this.requestFocus(true);
                 });
                 add(guppies_slider);
+            }
+        }
+
+        private class NetworkPanel extends JPanel {
+            private final JButton action_button;
+            private final JButton send_button;
+            private final JComboBox clients;
+
+            NetworkPanel() {
+                setLayout(new GridBagLayout());
+                setBackground(background);
+                setPreferredSize(new Dimension(270, 90));
+
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.anchor = GridBagConstraints.CENTER;
+                c.insets = new Insets(2,2,2,2);
+
+                TitledBorder border = new TitledBorder("Сервер");
+                border.setTitleFont(new Font("Open Sans", Font.BOLD, 14));
+                border.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+                setBorder(border);
+
+                clients = new JComboBox();
+                clients.setFocusable(false);
+                clients.setEnabled(false);
+
+                send_button = new JButton("Запросить конфиг. файл");
+                send_button.setEnabled(false);
+
+                action_button = new JButton("Подключиться");
+                action_button.addActionListener(actionEvent -> {
+                    if(!isConnected) {
+                        connect();
+                        if(isConnected) {
+                            send_button.setEnabled(true);
+                            clients.setEnabled(true);
+                            action_button.setText("Отключиться");
+                        }
+                    }
+                    else {
+                        disconnect();
+                        if(!isConnected) {
+                            send_button.setEnabled(false);
+                            clients.setEnabled(false);
+                            action_button.setText("Подключиться");
+                        }
+                    }
+                });
+
+                c.gridwidth = 2;
+                c.ipadx = 50;
+                add(action_button, c);
+                c.gridy++;
+                c.gridwidth = 1;
+                c.ipadx = 50;
+                add(clients, c);
+                c.gridx++;
+                c.gridwidth = 1;
+                c.ipadx = 5;
+                add(send_button, c);
+
+                Thread clientUpdater = new Thread(() -> {
+                    try {
+                        while(true) {
+                            int p_menu = inStream.readInt();
+                            switch (p_menu) {
+                                case 0 -> {
+                                    //dsa
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
         }
     }
@@ -913,7 +1045,7 @@ public class Application extends JFrame {
             Thread consoleIO = new Thread(() -> {
                 while(true) {
                     try {
-                        byte in[] = new byte[1];
+                        byte[] in = new byte[1];
                         if(pis.available() > 0) {
                             pis.read(in);
                             int buf = in[0];
@@ -945,6 +1077,87 @@ public class Application extends JFrame {
             consoleIO.start();
             this.add(new JScrollPane(info_area), BorderLayout.CENTER);
             this.setVisible(true);
+        }
+    }
+
+    private class userDialog extends JDialog {
+        private final int WINDOW_WIDTH = 300;
+        private final int WINDOW_HEIGHT = 120;
+
+        public userDialog() {
+            setTitle("Регистриция нового пользователя");
+            setIconImage(new ImageIcon("src/LaboratoryWork/Assets/user_add_icon.png").getImage());
+            setModal(true);
+            setAlwaysOnTop(true);
+            setResizable(false);
+            setBounds(screenSize.width/2 - WINDOW_WIDTH/2,
+                    screenSize.height/2 - WINDOW_HEIGHT/2,
+                    WINDOW_WIDTH, WINDOW_HEIGHT);
+            setLayout(new BorderLayout());
+
+            JTextArea text_area = new JTextArea("Имя пользователя");
+            text_area.setFont(new Font("Open Sans", Font.BOLD, 16));
+            text_area.setEditable(false);
+
+            JTextField name_area = new JTextField();
+            name_area.setFont(new Font("Open Sans", Font.ITALIC, 16));
+            name_area.setPreferredSize(new Dimension(WINDOW_WIDTH, 40));
+            name_area.addActionListener(actionEvent -> {
+                if(name_area.getText().equals(""))
+                    userName = "admin";
+                else {
+                    userName = name_area.getText();
+                }
+                dispose();
+            });
+
+            JButton ok_button = new JButton("ОК");
+            ok_button.addActionListener(actionEvent -> {
+                if(name_area.getText().equals(""))
+                    userName = "admin";
+                else {
+                    userName = name_area.getText();
+                }
+                dispose();
+            });
+
+            add(text_area, BorderLayout.NORTH);
+            add(name_area, BorderLayout.CENTER);
+            add(ok_button, BorderLayout.SOUTH);
+            setVisible(true);
+        }
+    }
+
+    private class ErrorDialog extends JDialog {
+        private final int WINDOW_WIDTH = 300;
+        private final int WINDOW_HEIGHT = 150;
+        public ErrorDialog(String msg) {
+            setTitle("Ошибка");
+            setIconImage(new ImageIcon("src/LaboratoryWork/Assets/warning.png").getImage());
+            setModal(true);
+            setAlwaysOnTop(true);
+            setResizable(false);
+            setLayout(new BorderLayout());
+            setBounds(screenSize.width/2 - WINDOW_WIDTH/2,
+                    screenSize.height/2 - WINDOW_HEIGHT/2,
+                    WINDOW_WIDTH, WINDOW_HEIGHT);
+
+            JTextArea info_error = new JTextArea();
+            info_error.setText(msg);
+            info_error.setEditable(false);
+            info_error.setLineWrap(true);
+            info_error.setWrapStyleWord(true);
+            info_error.setFont(new Font("Open Sans", Font.ITALIC, 14));
+            info_error.setBackground(Color.lightGray);
+            add(info_error, BorderLayout.CENTER);
+
+            JButton ok_button = new JButton("ОК");
+            ok_button.setPreferredSize(new Dimension(40,20));
+            ok_button.addActionListener(actionEvent -> dispose());
+            add(ok_button, BorderLayout.SOUTH);
+
+            add(new JScrollPane(info_error), BorderLayout.CENTER);
+            setVisible(true);
         }
     }
 
@@ -1023,14 +1236,9 @@ public class Application extends JFrame {
 
 
             JMenu console_menu = new JMenu("Консоль");
-            console_menu.addMenuListener(new MenuListener() {
-                @Override
-                public void menuSelected(MenuEvent e) { new ConsoleDialog(); }
-                @Override
-                public void menuDeselected(MenuEvent e) {}
-                @Override
-                public void menuCanceled(MenuEvent e) {}
-            });
+            JMenuItem console_start_item = new JMenuItem("Запуск");
+            console_start_item.addActionListener(actionEvent -> new ConsoleDialog());
+            console_menu.add(console_start_item);
 
             this.add(main_menu);
             this.add(console_menu);
@@ -1041,44 +1249,27 @@ public class Application extends JFrame {
         JLabel text;
 
         TimerPanel() {
-            this.setBackground(Color.GRAY);
+            setLayout(new FlowLayout());
+            this.setBackground(Color.RED);
+            setPreferredSize(new Dimension(280, 35));
 
-            text = new JLabel("Время симуляции: " + habitat.getTime());
-            text.setBounds(5,20, 200,20);
+            text = new JLabel("Время симуляции: " + habitat.getTime() + " [" + habitat.getStatus() + "]");
             text.setFont(new Font("Open Sans", Font.BOLD, 16));
             text.setVisible(true);
             text.setFocusable(false);
 
             this.setToolTipText("Текущее время симуляции в секундах");
-            this.add(text);
-            this.setVisible(true);
-        }
-    }
-
-    private class StatusPanel extends JPanel {
-        JLabel text;
-
-        StatusPanel() {
-            this.setBackground(Color.RED);
-
-            text = new JLabel("Статус симуляции: " + habitat.getStatus());
-            text.setBounds(5,20, 200,20);
-            text.setFont(new Font("Open Sans", Font.BOLD, 16));
-            text.setVisible(true);
-            text.setFocusable(false);
-
-            this.setToolTipText("Текущий статус симуляции");
-            this.add(text);
+            this.add(text, FlowLayout.LEFT);
             this.setVisible(true);
         }
     }
 
     private void writeConfig(String fileName) throws IOException {
         FileOutputStream fos = new FileOutputStream(new File(fileName));
-        String config = controlPanel.textFieldPanel.golden_text_field_N.getText() + "\n";
-        config += controlPanel.textFieldPanel.guppies_text_field_N.getText() + "\n";
-        config += controlPanel.textFieldPanel.golden_text_field_TTL.getText() + "\n";
-        config += controlPanel.textFieldPanel.guppies_text_field_TTL.getText() + "\n";
+        String config = controlPanel.periodPanel.golden_text_field_N.getText() + "\n";
+        config += controlPanel.periodPanel.guppies_text_field_N.getText() + "\n";
+        config += controlPanel.livePanel.golden_text_field_TTL.getText() + "\n";
+        config += controlPanel.livePanel.guppies_text_field_TTL.getText() + "\n";
         config += controlPanel.probablyPanel.comboBoxPanel.golden_combo_box.getSelectedItem() + "\n";
         config += controlPanel.probablyPanel.sliderPanel.guppies_slider.getValue() + "\n";
         config += controlPanel.priorityPanel.goldenFishPriority.getSelectedIndex() + "\n";
@@ -1095,25 +1286,25 @@ public class Application extends JFrame {
         int cur_line = 0;
         String line = "";
         while ((buf = bis.read()) != -1) {
-            if(!String.valueOf((char)buf).equals("\n"))
+            if(!String.valueOf((char) buf).equals("\n"))
                 line += String.valueOf((char)buf);
             else {
                 switch (cur_line) {
                     case 0 -> {
                         habitat.setN1(Double.parseDouble(line));
-                        controlPanel.textFieldPanel.golden_text_field_N.setText(line);
+                        controlPanel.periodPanel.golden_text_field_N.setText(line);
                     }
                     case 1 -> {
                         habitat.setN2(Double.parseDouble(line));
-                        controlPanel.textFieldPanel.guppies_text_field_N.setText(line);
+                        controlPanel.periodPanel.guppies_text_field_N.setText(line);
                     }
                     case 2 -> {
                         habitat.setGoldenTTL(Double.parseDouble(line));
-                        controlPanel.textFieldPanel.golden_text_field_TTL.setText(line);
+                        controlPanel.livePanel.golden_text_field_TTL.setText(line);
                     }
                     case 3 -> {
                         habitat.setGuppiesTTL(Double.parseDouble(line));
-                        controlPanel.textFieldPanel.guppies_text_field_TTL.setText(line);
+                        controlPanel.livePanel.guppies_text_field_TTL.setText(line);
                     }
                     case 4 -> {
                        habitat.setP1(Integer.parseInt(line));
@@ -1134,12 +1325,12 @@ public class Application extends JFrame {
                     case 8 -> {
                         if(Integer.parseInt(line) == 1) {
                             isVisible = true;
-                            timerPanel.setVisible(true);
+                            controlPanel.timerPanel.setVisible(true);
                             controlPanel.radioButtonPanel.show_timer_button.setSelected(true);
                         }
                         else {
                             isVisible = false;
-                            timerPanel.setVisible(false);
+                            controlPanel.timerPanel.setVisible(false);
                             controlPanel.radioButtonPanel.hide_timer_button.setSelected(true);
                         }
                     }
@@ -1154,10 +1345,11 @@ public class Application extends JFrame {
                         }
                     }
                 }
-                cur_line++;
                 line = "";
+                cur_line++;
             }
         }
+        bis.close();
     }
 
     private void saveObjects(File file) {
@@ -1190,14 +1382,13 @@ public class Application extends JFrame {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                timerPanel.text.setText("Время симуляции: " + habitat.getTime());
-                statusPanel.text.setText("Статус симуляции: " + habitat.getStatus());
+                controlPanel.timerPanel.text.setText("Время симуляции: " + habitat.getTime() + " [" + habitat.getStatus() + "]");
                 if(habitat.getStatus() == Status.ВЫКЛ)
-                    statusPanel.setBackground(Color.RED);
+                    controlPanel.timerPanel.setBackground(Color.RED);
                 else if(habitat.getStatus() == Status.ВКЛ)
-                    statusPanel.setBackground(Color.GREEN);
+                    controlPanel.timerPanel.setBackground(Color.GREEN);
                 else if(habitat.getStatus() == Status.ПАУЗА)
-                    statusPanel.setBackground(Color.ORANGE);
+                    controlPanel.timerPanel.setBackground(Color.ORANGE);
             }
         }, 0, habitat.getPeriod());
     }

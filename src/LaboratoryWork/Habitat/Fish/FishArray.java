@@ -13,8 +13,13 @@ public class FishArray {
     private static volatile LinkedList<Fish> list = new LinkedList<>();
     private static HashSet<Integer> set = new HashSet<>();
     private static TreeMap<Integer, Double> map = new TreeMap<>();
+    private static int countGoldenFishCreated;
+    private static int countGuppiesFishCreated;
 
-    private FishArray() {}
+    private FishArray() {
+        countGoldenFishCreated = 0;
+        countGuppiesFishCreated = 0;
+    }
 
     public static synchronized FishArray getFishArray() {
         if (fishArray == null) {
@@ -24,6 +29,11 @@ public class FishArray {
     }
 
     public synchronized void addFish(Fish fish, double bornTime) {
+        if(fish instanceof GoldenFish)
+            countGoldenFishCreated++;
+        else
+            countGuppiesFishCreated++;
+
         int id = fish.hashCode();
         list.add(fish);
         set.add(id);
@@ -104,6 +114,8 @@ public class FishArray {
     }
 
     public synchronized void removeAllFishes() {
+        countGoldenFishCreated = 0;
+        countGuppiesFishCreated = 0;
         list.clear();
         set.clear();
         map.clear();
@@ -114,5 +126,19 @@ public class FishArray {
     }
     public synchronized TreeMap<Integer, Double> getMap() {
         return map;
+    }
+
+    public synchronized int getAllFishCount() {
+        return countGoldenFishCreated + countGuppiesFishCreated;
+    }
+
+    public synchronized int getFishCount(FishTypes type) {
+        int toReturn;
+        switch(type) {
+            case GoldenFish -> toReturn = countGoldenFishCreated;
+            case GuppiesFish -> toReturn = countGuppiesFishCreated;
+            default -> throw new IllegalArgumentException("Wrong fish type: " + type);
+        }
+        return toReturn;
     }
 }

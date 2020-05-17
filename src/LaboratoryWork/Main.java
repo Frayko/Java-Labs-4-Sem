@@ -12,6 +12,6 @@ public class Main {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             ex.printStackTrace();
         }
-        new Application(800, 600, new Habitat());
+        new Application(960, 720, new Habitat());
     }
 }
