@@ -6,27 +6,27 @@ import java.awt.*;
 import java.util.*;
 
 public class FishArray {
-    private static volatile FishArray fishArray;
-    private static volatile LinkedList<Fish> list = new LinkedList<>();
+    private static FishArray fishArray;
+    private static LinkedList<Fish> list = new LinkedList<>();
     private static HashSet<Integer> set = new HashSet<>();
     private static TreeMap<Integer, Double> map = new TreeMap<>();
 
     private FishArray() {}
 
-    public static synchronized FishArray getFishArray() {
+    public static FishArray getFishArray() {
         if(fishArray == null)
             fishArray = new FishArray();
         return fishArray;
     }
 
-    public synchronized void addFish(Fish fish, double bornTime) {
+    public void addFish(Fish fish, double bornTime) {
         int id = fish.hashCode();
         list.add(fish);
         set.add(id);
         map.put(id, bornTime);
     }
 
-    public synchronized void checkTTL(double currentTime, double goldenTTL, double guppiesTTL) {
+    public void checkTTL(double currentTime, double goldenTTL, double guppiesTTL) {
         LinkedList<Fish> delFishes = new LinkedList<>();
 
         for(Fish fish : list) {
@@ -47,18 +47,18 @@ public class FishArray {
         }
     }
 
-    public synchronized void drawFishes(Graphics g) {
+    public void drawFishes(Graphics g) {
         for(Fish fish : list) {
             fish.drawImage(g);
         }
     }
 
-    public synchronized void removeAllFishes() {
+    public void removeAllFishes() {
         list.clear();
         set.clear();
         map.clear();
     }
 
-    public synchronized LinkedList<Fish> getList() { return list; }
-    public synchronized TreeMap<Integer, Double> getMap() { return map; }
+    public LinkedList<Fish> getList() { return list; }
+    public TreeMap<Integer, Double> getMap() { return map; }
 }
