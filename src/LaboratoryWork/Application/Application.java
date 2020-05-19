@@ -913,7 +913,7 @@ public class Application extends JFrame {
             Thread consoleIO = new Thread(() -> {
                 while(true) {
                     try {
-                        byte in[] = new byte[1];
+                        byte[] in = new byte[1];
                         if(pis.available() > 0) {
                             pis.read(in);
                             int buf = in[0];
@@ -1075,16 +1075,16 @@ public class Application extends JFrame {
 
     private void writeConfig(String fileName) throws IOException {
         FileOutputStream fos = new FileOutputStream(new File(fileName));
-        String config = controlPanel.textFieldPanel.golden_text_field_N.getText() + "\n";
-        config += controlPanel.textFieldPanel.guppies_text_field_N.getText() + "\n";
-        config += controlPanel.textFieldPanel.golden_text_field_TTL.getText() + "\n";
-        config += controlPanel.textFieldPanel.guppies_text_field_TTL.getText() + "\n";
-        config += controlPanel.probablyPanel.comboBoxPanel.golden_combo_box.getSelectedItem() + "\n";
-        config += controlPanel.probablyPanel.sliderPanel.guppies_slider.getValue() + "\n";
-        config += controlPanel.priorityPanel.goldenFishPriority.getSelectedIndex() + "\n";
-        config += controlPanel.priorityPanel.guppiesFishPriority.getSelectedIndex() + "\n";
-        config += isVisible ? "1\n" : "0\n";
-        config += controlPanel.checkBoxPanel.modal_info_checkbox.isSelected() ? "1\n" : "0\n";
+        String config = controlPanel.textFieldPanel.golden_text_field_N.getText() + ",";
+        config += controlPanel.textFieldPanel.guppies_text_field_N.getText() + ",";
+        config += controlPanel.textFieldPanel.golden_text_field_TTL.getText() + ",";
+        config += controlPanel.textFieldPanel.guppies_text_field_TTL.getText() + ",";
+        config += controlPanel.probablyPanel.comboBoxPanel.golden_combo_box.getSelectedItem() + ",";
+        config += controlPanel.probablyPanel.sliderPanel.guppies_slider.getValue() + ",";
+        config += controlPanel.priorityPanel.goldenFishPriority.getSelectedIndex() + ",";
+        config += controlPanel.priorityPanel.guppiesFishPriority.getSelectedIndex() + ",";
+        config += isVisible ? "1," : "0,";
+        config += controlPanel.checkBoxPanel.modal_info_checkbox.isSelected() ? "1," : "0,";
         fos.write(config.getBytes());
         fos.close();
     }
@@ -1095,7 +1095,7 @@ public class Application extends JFrame {
         int cur_line = 0;
         String line = "";
         while ((buf = bis.read()) != -1) {
-            if(!String.valueOf((char)buf).equals("\n"))
+            if(!String.valueOf((char)buf).equals(","))
                 line += String.valueOf((char)buf);
             else {
                 switch (cur_line) {

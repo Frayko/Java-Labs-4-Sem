@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="43cc417c-98e6-46a0-964e-50c2cc56a802" name="Default Changelist" comment="Fix">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Configs/config.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishArray.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishArray.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishCreator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Fish/FishCreator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Habitat/Habitat.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/LaboratoryWork/Application/Application.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -231,7 +227,8 @@
     <MESSAGE value="add exit item in main menu" />
     <MESSAGE value="fix ModalInfoDialog" />
     <MESSAGE value="Fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix" />
+    <MESSAGE value="Complete Laboratory Work 6" />
+    <option name="LAST_COMMIT_MESSAGE" value="Complete Laboratory Work 6" />
   </component>
   <component name="WindowStateProjectService">
     <state x="276" y="20" key="#Plugins" timestamp="1588533741762">
@@ -386,6 +383,11 @@
     <state x="623" y="244" width="672" height="678" key="search.everywhere.popup/0.0.1920.1050@0.0.1920.1050" timestamp="1585128763375" />
   </component>
   <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo typeName="java.net.Socket$SocketInputStream" fieldName="parent" />
+      </pinned-members>
+    </pin-to-top-manager>
     <watches-manager>
       <configuration name="Applet">
         <watch expression="IMG" language="JAVA" />
