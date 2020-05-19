@@ -219,28 +219,20 @@ public class Application extends JFrame {
         }
     }
 
-    private void connect() {
-        try {
-            isConnected = true;
-            socket = new Socket(host, port);
-            inStream = new DataInputStream(socket.getInputStream());
-            outStream = new DataOutputStream(socket.getOutputStream());
-        }
-        catch (IOException e) {
-            new ErrorDialog("Попытка подключения к серверу не удалась!\nПроверьте работу сервера...");
-            isConnected = false;
-        }
+    private void connect() throws IOException {
+        socket = new Socket(host, port);
+        inStream = new DataInputStream(socket.getInputStream());
+        outStream = new DataOutputStream(socket.getOutputStream());
+        isConnected = true;
+        controlPanel.networkPanel.send_button.setEnabled(true);
+        controlPanel.networkPanel.clients.setEnabled(true);
+        controlPanel.networkPanel.action_button.setText("Отключиться");
     }
 
-    private void disconnect() {
-        try {
-            isConnected = false;
-            inStream.close();
-            outStream.close();
-        } catch (IOException e) {
-            new ErrorDialog("Попытка отключения от сервера не удалась!");
-            isConnected = true;
-        }
+    private void disconnect() throws IOException {
+        socket.close();
+        inStream.close();
+        outStream.close();
     }
 
     private void show_hide_timer() {
@@ -510,8 +502,7 @@ public class Application extends JFrame {
                     catch (Exception e) {
                         habitat.setN1(0.5);
                         golden_text_field_N.setText(Double.toString(habitat.getN1()));
-                        JOptionPane.showMessageDialog(null,
-                                "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        new ErrorDialog("Введено неверное значение...");
                     }
                 });
                 add(golden_text_field_N, c);
@@ -540,8 +531,7 @@ public class Application extends JFrame {
                     catch (Exception e) {
                         habitat.setN1(0.3);
                         guppies_text_field_N.setText(Double.toString(habitat.getN1()));
-                        JOptionPane.showMessageDialog(null,
-                                "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        new ErrorDialog("Введено неверное значение...");
                     }
                 });
                 add(guppies_text_field_N, c);
@@ -591,8 +581,7 @@ public class Application extends JFrame {
                     catch (Exception e) {
                         habitat.setGoldenTTL(1.0);
                         golden_text_field_TTL.setText(Double.toString(habitat.getGoldenTTL()));
-                        JOptionPane.showMessageDialog(null,
-                                "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        new ErrorDialog("Введено неверное значение...");
                     }
                 });
                 add(golden_text_field_TTL, c);
@@ -621,8 +610,7 @@ public class Application extends JFrame {
                     catch (Exception e) {
                         habitat.setGuppiesTTL(2.0);
                         guppies_text_field_TTL.setText(Double.toString(habitat.getGuppiesTTL()));
-                        JOptionPane.showMessageDialog(null,
-                                "Введено неверное значение...", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        new ErrorDialog("Введено неверное значение...");
                     }
                 });
                 add(guppies_text_field_TTL, c);
@@ -804,7 +792,8 @@ public class Application extends JFrame {
         private class NetworkPanel extends JPanel {
             private final JButton action_button;
             private final JButton send_button;
-            private final JComboBox clients;
+            private final JComboBox<String> clients;
+            private ClientUpdater clientUpdater;
 
             NetworkPanel() {
                 setLayout(new GridBagLayout());
@@ -814,6 +803,7 @@ public class Application extends JFrame {
                 GridBagConstraints c = new GridBagConstraints();
                 c.gridx = 0;
                 c.gridy = 0;
+                c.weightx = 1;
                 c.anchor = GridBagConstraints.CENTER;
                 c.insets = new Insets(2,2,2,2);
 
@@ -822,29 +812,43 @@ public class Application extends JFrame {
                 border.setBorder(BorderFactory.createLineBorder(Color.black, 2));
                 setBorder(border);
 
-                clients = new JComboBox();
+                clients = new JComboBox<>();
+                clients.setPreferredSize(new Dimension(30, 20));
                 clients.setFocusable(false);
                 clients.setEnabled(false);
 
                 send_button = new JButton("Запросить конфиг. файл");
                 send_button.setEnabled(false);
+                send_button.addActionListener(actionEvent -> {
+                    try {
+                        String target = clients.getSelectedItem().toString();
+                        outStream.writeUTF("send");
+                        outStream.writeUTF(target);
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
 
                 action_button = new JButton("Подключиться");
                 action_button.addActionListener(actionEvent -> {
-                    if(!isConnected) {
-                        connect();
-                        if(isConnected) {
-                            send_button.setEnabled(true);
-                            clients.setEnabled(true);
-                            action_button.setText("Отключиться");
+                    try {
+                        if (!isConnected) {
+                            connect();
+                            outStream.writeUTF(userName);
+                            clientUpdater = new ClientUpdater();
+                        } else {
+                            outStream.writeUTF("disconnect");
+                            clientUpdater.interrupt();
+                            disconnect();
                         }
                     }
-                    else {
-                        disconnect();
+                    catch (IOException e) {
                         if(!isConnected) {
-                            send_button.setEnabled(false);
-                            clients.setEnabled(false);
-                            action_button.setText("Подключиться");
+                            new ErrorDialog("Попытка подключения не удалась!\nПроверьте работу сервера...\n");
+                        }
+                        else {
+                            new ErrorDialog("Принудительное отключение");
                         }
                     }
                 });
@@ -854,28 +858,63 @@ public class Application extends JFrame {
                 add(action_button, c);
                 c.gridy++;
                 c.gridwidth = 1;
-                c.ipadx = 50;
                 add(clients, c);
                 c.gridx++;
                 c.gridwidth = 1;
                 c.ipadx = 5;
                 add(send_button, c);
+            }
 
-                Thread clientUpdater = new Thread(() -> {
-                    try {
-                        while(true) {
-                            int p_menu = inStream.readInt();
-                            switch (p_menu) {
-                                case 0 -> {
-                                    //dsa
+            public void setConnection (boolean status) { isConnected = status; }
+        }
+    }
+
+    private class ClientUpdater extends Thread {
+        public ClientUpdater() {
+            Thread clientUpdater = new Thread(() -> {
+                try {
+                    while(true) {
+                        String action = inStream.readUTF();
+                        switch (action) {
+                            case "update" -> {
+                                usersList.clear();
+                                controlPanel.networkPanel.clients.removeAllItems();
+                                int size = inStream.readInt();
+                                for(int i = 0; i < size; i++) {
+                                    usersList.addLast(inStream.readUTF());
+                                    controlPanel.networkPanel.clients.addItem(usersList.get(i));
                                 }
+
+                                if(size > 0)
+                                    controlPanel.networkPanel.clients.setSelectedItem(0);
+                            }
+
+                            case "request" -> {
+                                String target = inStream.readUTF();
+                                outStream.writeUTF("answer");
+                                outStream.writeUTF(target);
+                                outStream.writeUTF(configFile);
+                            }
+
+                            case "accept" -> {
+                                String data = inStream.readUTF();
+                                readConfig(data);
                             }
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
-                });
-            }
+                }
+                catch (IOException e) {
+                    controlPanel.networkPanel.send_button.setEnabled(false);
+                    controlPanel.networkPanel.clients.removeAllItems();
+                    controlPanel.networkPanel.clients.setEnabled(false);
+                    controlPanel.networkPanel.action_button.setText("Подключиться");
+                    controlPanel.networkPanel.setConnection(false);
+                }
+            });
+
+            clientUpdater.setDaemon(true);
+            clientUpdater.setName("Client updater");
+            clientUpdater.start();
         }
     }
 
@@ -1000,11 +1039,11 @@ public class Application extends JFrame {
                 String command = input_area.getText();
                 info_area.append(command + "\n");
                 if (command.startsWith("help")) {
-                    info_area.append("Доступные команды:\n" +
-                            "clear - очистить экран\n" +
-                            "close - закрыть консоль\n" +
-                            "setP1 [от 0 до 100] - Установить вероятность рождения золотой рыбки\n" +
-                            "getP1 - Узнать вероятность рождения золотой рыбки\n");
+                    info_area.append("> Доступные команды:\n" +
+                            "> clear - очистить экран\n" +
+                            "> close - закрыть консоль\n" +
+                            "> setP1 [от 0 до 100] - Установить вероятность рождения золотой рыбки\n" +
+                            "> getP1 - Узнать вероятность рождения золотой рыбки\n");
                 }
                 else if (command.startsWith("clear")) {
                     info_area.setText("");
@@ -1020,10 +1059,10 @@ public class Application extends JFrame {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    info_area.append("Успешно изменено!\n");
+                    info_area.append("> Успешно изменено!\n");
                 }
                 else if (command.startsWith("getP1")) {
-                    info_area.append("Вероятность рождения золотой рыбки: " + habitat.getP1() + "%\n");
+                    info_area.append("> Вероятность рождения золотой рыбки: " + habitat.getP1() + "%\n");
                 }
                 else if (command.startsWith("close")) {
                     try {
@@ -1036,7 +1075,7 @@ public class Application extends JFrame {
                     this.dispose();
                 }
                 else {
-                    info_area.append("Неизвестная команда. Узнать все доступные команды: help\n");
+                    info_area.append("> Неизвестная команда. Узнать все доступные команды: help\n");
                 }
                 input_area.setText("");
             });
@@ -1266,16 +1305,16 @@ public class Application extends JFrame {
 
     private void writeConfig(String fileName) throws IOException {
         FileOutputStream fos = new FileOutputStream(new File(fileName));
-        String config = controlPanel.periodPanel.golden_text_field_N.getText() + "\n";
-        config += controlPanel.periodPanel.guppies_text_field_N.getText() + "\n";
-        config += controlPanel.livePanel.golden_text_field_TTL.getText() + "\n";
-        config += controlPanel.livePanel.guppies_text_field_TTL.getText() + "\n";
-        config += controlPanel.probablyPanel.comboBoxPanel.golden_combo_box.getSelectedItem() + "\n";
-        config += controlPanel.probablyPanel.sliderPanel.guppies_slider.getValue() + "\n";
-        config += controlPanel.priorityPanel.goldenFishPriority.getSelectedIndex() + "\n";
-        config += controlPanel.priorityPanel.guppiesFishPriority.getSelectedIndex() + "\n";
-        config += isVisible ? "1\n" : "0\n";
-        config += controlPanel.checkBoxPanel.modal_info_checkbox.isSelected() ? "1\n" : "0\n";
+        String config = controlPanel.periodPanel.golden_text_field_N.getText() + ",";
+        config += controlPanel.periodPanel.guppies_text_field_N.getText() + ",";
+        config += controlPanel.livePanel.golden_text_field_TTL.getText() + ",";
+        config += controlPanel.livePanel.guppies_text_field_TTL.getText() + ",";
+        config += controlPanel.probablyPanel.comboBoxPanel.golden_combo_box.getSelectedItem() + ",";
+        config += controlPanel.probablyPanel.sliderPanel.guppies_slider.getValue() + ",";
+        config += controlPanel.priorityPanel.goldenFishPriority.getSelectedIndex() + ",";
+        config += controlPanel.priorityPanel.guppiesFishPriority.getSelectedIndex() + ",";
+        config += isVisible ? "1," : "0,";
+        config += controlPanel.checkBoxPanel.modal_info_checkbox.isSelected() ? "1," : "0,";
         fos.write(config.getBytes());
         fos.close();
     }
@@ -1286,7 +1325,7 @@ public class Application extends JFrame {
         int cur_line = 0;
         String line = "";
         while ((buf = bis.read()) != -1) {
-            if(!String.valueOf((char) buf).equals("\n"))
+            if(!String.valueOf((char) buf).equals(","))
                 line += String.valueOf((char)buf);
             else {
                 switch (cur_line) {
