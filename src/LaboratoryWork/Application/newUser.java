@@ -103,6 +103,7 @@ public class newUser extends Thread {
         }
         catch (IOException e) {
             Server.usersList.remove(this);
+            updateUsers();
             Server.serverConsole.info_area.append(">>> " + this.getUserName() + " был исключён. Причина: клиент перестал отвечать...\n");
         }
 

@@ -5,14 +5,14 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.sql.*;
+import java.util.*;
 import java.net.Socket;
+import java.util.Timer;
 
 import LaboratoryWork.Habitat.Fish.Fish;
 import LaboratoryWork.Habitat.Fish.FishArray;
+import LaboratoryWork.Habitat.Fish.Objects.GuppiesFish;
 import LaboratoryWork.Habitat.Habitat;
 import LaboratoryWork.Habitat.Fish.Objects.GoldenFish;
 import LaboratoryWork.Habitat.Status;
@@ -258,6 +258,7 @@ public class Application extends JFrame {
         ProbablyPanel probablyPanel;
         PriorityPanel priorityPanel;
         NetworkPanel networkPanel;
+        DataBasePanel dataBasePanel;
 
         Color background = Color.PINK;
 
@@ -287,6 +288,8 @@ public class Application extends JFrame {
             gbc.gridy++;
             add(networkPanel = new NetworkPanel(), gbc);
             gbc.gridy++;
+            //add(dataBasePanel = new DataBasePanel(), gbc);
+            //gbc.gridy++;
             add(radioButtonPanel = new RadioButtonPanel(), gbc);
             gbc.gridy++;
             add(checkBoxPanel = new CheckBoxPanel(), gbc);
@@ -306,7 +309,7 @@ public class Application extends JFrame {
                 setLayout(new GridLayout(3,2));
                 setBackground(background);
 
-                Dimension button_size = new Dimension(135,30);
+                Dimension button_size = new Dimension(135,20);
 
                 start_button = new JButton("Начать");
                 start_button.setPreferredSize(button_size);
@@ -867,6 +870,223 @@ public class Application extends JFrame {
 
             public void setConnection (boolean status) { isConnected = status; }
         }
+
+        private class DataBasePanel extends JPanel {
+            private JCheckBox golden_fish_check_box = null;
+            private JCheckBox guppies_fish_check_box = null;
+            private JButton action_button;
+            private JButton save_button = null;
+            private JButton load_button = null;
+
+            private final String url = "jdbc:postgresql://localhost:5432/postgres";
+            private String user = "";
+            private String password = "";
+            Connection connection = null;
+            PreparedStatement preparedStatement = null;
+            ResultSet resultSet = null;
+            private boolean isGoldenFishAdd = true;
+            private boolean isGuppiesFishAdd = true;
+            private boolean isConnected = false;
+
+            public DataBasePanel() {
+                setLayout(new GridBagLayout());
+                setBackground(background);
+                setPreferredSize(new Dimension(270, 150));
+
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.anchor = GridBagConstraints.CENTER;
+                c.insets = new Insets(2,2,2,2);
+
+                TitledBorder border = new TitledBorder("База данных");
+                border.setTitleFont(new Font("Open Sans", Font.BOLD, 14));
+                border.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+                setBorder(border);
+
+
+                c.ipady = 5;
+                add(new JLabel("Имя"), c);
+                c.gridx++;
+                c.ipadx = 200;
+                c.gridwidth = 4;
+                JTextField name_field = new JTextField();
+                name_field.setPreferredSize(new Dimension(60, 30));
+                name_field.addActionListener(actionEvent -> {
+                    user = name_field.getText();
+                });
+                add(name_field, c);
+                c.gridy++;
+                c.ipadx = 0;
+                c.gridx = 0;
+                c.gridwidth = 1;
+
+                add(new JLabel("Пароль"), c);
+                c.gridx++;
+                c.ipadx = 200;
+                c.gridwidth = 4;
+                JPasswordField password_field = new JPasswordField();
+                password_field.setPreferredSize(new Dimension(60,30));
+                password_field.addActionListener(actionEvent -> {
+                    password = "";
+                    char[] buf = password_field.getPassword();
+                    for (char value : buf) password += value;
+                });
+                add(password_field, c);
+                c.ipadx = 0;
+                c.gridx = 0;
+                c.ipady = 0;
+                c.gridy++;
+
+                c.gridwidth = 5;
+                action_button = new JButton("Подключиться");
+                action_button.addActionListener(actionEvent -> {
+                    try {
+                        if(!isConnected) {
+                            password = "";
+                            user = name_field.getText();
+                            char[] buf = password_field.getPassword();
+                            for (char value : buf) password += value;
+                            connection = DriverManager.getConnection(url, user, password);
+                            golden_fish_check_box.setEnabled(true);
+                            guppies_fish_check_box.setEnabled(true);
+                            save_button.setEnabled(true);
+                            load_button.setEnabled(true);
+                            action_button.setText("Отключиться");
+                            isConnected = true;
+                        }
+                        else {
+                            connection = null;
+                            golden_fish_check_box.setEnabled(false);
+                            guppies_fish_check_box.setEnabled(false);
+                            save_button.setEnabled(false);
+                            load_button.setEnabled(false);
+                            action_button.setText("Подключиться");
+                            isConnected = false;
+                        }
+                    } catch (SQLException e) {
+                        isConnected = false;
+                        new ErrorDialog("Ошибка подключения!\nПроверьте правильность заполненных данных...");
+                    }
+                });
+                add(action_button, c);
+                c.gridy++;
+                c.gridwidth = 1;
+
+                c.gridx = 0;
+                add(new JLabel("Сохранение:"), c);
+                c.gridx++;
+                c.gridwidth = 2;
+                c.ipadx = 30;
+
+                golden_fish_check_box = new JCheckBox("Золотых");
+                golden_fish_check_box.setEnabled(false);
+                golden_fish_check_box.setBackground(background);
+                golden_fish_check_box.setSelected(isGoldenFishAdd);
+                golden_fish_check_box.addActionListener(actionEvent -> {
+                    isGoldenFishAdd = golden_fish_check_box.isSelected();
+                });
+                add(golden_fish_check_box, c);
+                c.gridx = 3;
+
+                guppies_fish_check_box = new JCheckBox("Гуппи");
+                guppies_fish_check_box.setBackground(background);
+                guppies_fish_check_box.setEnabled(false);
+                guppies_fish_check_box.setSelected(isGuppiesFishAdd);
+                guppies_fish_check_box.addActionListener(actionEvent -> {
+                    isGuppiesFishAdd = guppies_fish_check_box.isSelected();
+                });
+                add(guppies_fish_check_box, c);
+                c.gridx = 0;
+                c.gridy++;
+
+                c.ipadx = 30;
+                save_button = new JButton("Сохранить");
+                save_button.setEnabled(false);
+                save_button.addActionListener(actionEvent -> {
+                    String SQL_delete = "DELETE FROM fishes WHERE user_name=?";
+                    String SQL_save = "INSERT INTO fishes(is_Golden, cord_x, cord_y, user_name) VALUES(?, ?, ?, ?)";
+
+                    LinkedList<Fish> fishArray = FishArray.getFishArray().getList();
+
+                    try {
+                        preparedStatement = connection.prepareStatement(SQL_delete);
+                        preparedStatement.setObject(1, userName);
+                        preparedStatement.executeUpdate();
+                        preparedStatement.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    for(Fish fish : fishArray) {
+                        if((fish instanceof GoldenFish) && isGoldenFishAdd) {
+                            try {
+                                preparedStatement = connection.prepareStatement(SQL_save);
+                                preparedStatement.setBoolean(1, true);
+                                preparedStatement.setInt(2, fish.getX());
+                                preparedStatement.setInt(3, fish.getY());
+                                preparedStatement.setObject(4, userName);
+                                preparedStatement.executeUpdate();
+                                preparedStatement.close();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        else if((fish instanceof GuppiesFish) && isGuppiesFishAdd) {
+                            try {
+                                preparedStatement = connection.prepareStatement(SQL_save);
+                                preparedStatement.setBoolean(1, false);
+                                preparedStatement.setInt(2, fish.getX());
+                                preparedStatement.setInt(3, fish.getY());
+                                preparedStatement.setObject(4, userName);
+                                preparedStatement.executeUpdate();
+                                preparedStatement.close();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+                add(save_button, c);
+                c.gridx = 3;
+
+                load_button = new JButton("Загрузить");
+                load_button.setEnabled(false);
+                load_button.addActionListener(actionEvent -> {
+                    try {
+                        if(habitat.getStatus() == Status.ВКЛ)
+                            pause();
+                        String SQL_load = "SELECT * FROM fishes WHERE user_name=?";
+                        preparedStatement = connection.prepareStatement(SQL_load);
+                        preparedStatement.setObject(1, userName);
+                        resultSet = preparedStatement.executeQuery();
+
+                        FishArray.getFishArray().removeAllFishes();
+
+                        while(resultSet.next()) {
+                            boolean isGolden = resultSet.getBoolean(1);
+                            int x = resultSet.getInt(2);
+                            int y = resultSet.getInt(3);
+                            if(isGolden)
+                                FishArray.getFishArray().addFish(new GoldenFish(x,y), habitat.getTime());
+                            else
+                                FishArray.getFishArray().addFish(new GuppiesFish(x,y), habitat.getTime());
+
+                        }
+
+                        habitat.repaint();
+                        resultSet.close();
+                        preparedStatement.close();
+                    }
+                    catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
+                add(load_button, c);
+            }
+        }
     }
 
     private class ClientUpdater extends Thread {
@@ -1421,7 +1641,7 @@ public class Application extends JFrame {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                controlPanel.timerPanel.text.setText("Время симуляции: " + habitat.getTime() + " [" + habitat.getStatus() + "]");
+                controlPanel.timerPanel.text.setText("Время симуляции: " + habitat.getTime());
                 if(habitat.getStatus() == Status.ВЫКЛ)
                     controlPanel.timerPanel.setBackground(Color.RED);
                 else if(habitat.getStatus() == Status.ВКЛ)
