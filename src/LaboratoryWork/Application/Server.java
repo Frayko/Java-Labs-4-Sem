@@ -55,7 +55,7 @@ public class Server {
 
         public ServerConsole() {
             this.setTitle("Консоль сервера");
-            this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/console_icon.png").getImage());
+            this.setIconImage(new ImageIcon("src/LaboratoryWork/Assets/users_icon.png").getImage());
             this.setBackground(Color.white);
             this.setForeground(Color.DARK_GRAY);
             this.setBounds(50, 50, dialog_window_width, dialog_window_height);

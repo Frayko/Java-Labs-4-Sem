@@ -29,6 +29,7 @@ public class Habitat extends JComponent {
     private final long PERIOD = 100;
 
     public Habitat() {
+        setLayout(new BorderLayout());
         N1 = 0.5;
         N2 = 0.3;
         P1 = 40;
