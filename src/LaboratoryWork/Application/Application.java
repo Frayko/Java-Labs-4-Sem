@@ -890,10 +890,13 @@ public class Application extends JFrame {
                             }
 
                             case "request" -> {
+                                String bufFile = directory + "/buf.txt";
+                                new File(bufFile).deleteOnExit();
+                                writeConfig(bufFile);
                                 String target = inStream.readUTF();
                                 outStream.writeUTF("answer");
                                 outStream.writeUTF(target);
-                                outStream.writeUTF(configFile);
+                                outStream.writeUTF(bufFile);
                             }
 
                             case "accept" -> {

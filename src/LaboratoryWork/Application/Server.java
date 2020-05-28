@@ -104,6 +104,7 @@ public class Server {
                 public void windowClosing(WindowEvent e) {
                     super.windowClosing(e);
                     dispose();
+
                 }
             });
 
