@@ -108,6 +108,10 @@ public class Application extends JFrame {
                         isShowDataBasePanel = !isShowDataBasePanel;
                         controlPanel.checkBoxPanel.database_show_checkbox.setSelected(isShowDataBasePanel);
                         dataBaseToolBar.setVisible(isShowDataBasePanel);
+                        if(isShowDataBasePanel && dataBaseToolBar.user_name_field.isEnabled())
+                            dataBaseToolBar.user_name_field.requestFocus(true);
+                        else
+                            Application.this.requestFocus(true);
                     }
                     case KeyEvent.VK_T -> show_hide_timer();
                     case KeyEvent.VK_P -> {
@@ -1186,6 +1190,14 @@ public class Application extends JFrame {
                 }
                 dispose();
                 Application.this.requestFocus(true);
+            });
+
+            addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    super.windowClosing(e);
+                    userName = "admin";
+                }
             });
 
             add(text_area, BorderLayout.NORTH);
